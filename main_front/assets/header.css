@@ -18,6 +18,14 @@ body {
 aside{
     background-color: pink;
     width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+aside h2{
+    border: 1px solid black;
+    margin: 0;
 }
 
 header{
@@ -42,4 +50,26 @@ footer{
     display: flex;
     flex-direction: column;
     width: 100%;
+}
+
+.sidebar{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+.fechado{
+    display: none;
+}
+
+.aberto{
+    display: block;
+}
+
+.separador{
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 80%;
+    padding: 20px;
 }

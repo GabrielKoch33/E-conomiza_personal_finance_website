@@ -2,32 +2,48 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- a largura é ajustada de acordo com o dispositivo E a escala é 1 (sem qualquer zoom)-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- a largura é ajustada conforme o dispositivo e a escala é 1 (sem qualquer zoom)-->
     <meta name="description" content="Carteira Virtual para controle financeiro. eWallet"> <!-- fornece uma descrição para os crawlers lerem-->
     <meta name="author" content="Gabriel Koch da Silva"> 
-    <meta name="keywords" content="HTML, CSS, JAVASCRIPT, PYTHON, PHP, SQL, POO, DATABASES"> <!-- palavras chaves para o navegador-->
+    <meta name="keywords" content="HTML, CSS, JAVASCRIPT, PYTHON, SPRING BOOT, JAVA, SQL, POO, DATABASES"> <!-- palavras-chave para o navegador-->
     <title>eWallet</title>
     <link rel="stylesheet" href="header.css">
+    <script src="header.js"></script>
 </head>
 <body>
     <aside>
-        <!-- Todos os nomes com 'v' serão um dropdown para submenus-->
-        <dl style="list-style-type: none;">
-            <dt> Menu </dt>
-            <dt> --- </dt>
-            <dt>Dashboard</dt>
-            <dt>Movimentações</dt>
-                <dd>-Entradas</dd>
-                <dd>-Saídas</dd>
-                <dd>-Categorias</dd>
-            <dt>Economias v</dt>
-                <dd>-Cofrinhos</dd>
-                <dd>-Metas</dd>
-            <dt>Investimentos</dt>
-                <dd>-Carteira</dd>
-                <dd>-Indicadores B3</dd>
-            <dt>Emitir relatórios</dt>
-        </dl>
+        <!--REFATORAR ISSO COM 'GRID'-->
+        <h2> MENUS </h2>
+        <nav class="sidebar">
+            <div class="separador">
+                <a href="../dashboard/dashboard.html">Dashboards</a>
+            </div>
+            <div class="separador">
+                <button class="drop_menu" onclick="acordeaoMenu('movimentacoes')">Movimentações</button>
+                    <ul id="movimentacoes" class="fechado">
+                        <li><a href="../movimentacoes/entradas.html">Receitas</a></li>
+                        <li><a href="../movimentacoes/despesas.html">Despesas</a></li>
+                        <li><a href="../movimentacoes/categorias.html">Categorias</a></li>
+                    </ul>
+            </div>
+            <div class="separador">
+                <button class="drop_menu" onclick="acordeaoMenu('economias')">Economias</button>
+                    <ul id="economias" class="fechado">
+                        <li><a href="../economias/cofrinhos.html">Cofrinhos</a></li>
+                        <li><a href="../economias/metas.html">Metas</a></li>
+                    </ul>
+            </div>
+            <div class="separador">
+                <button class="drop_menu" onclick="acordeaoMenu('investimentos')">Investimentos</button>
+                    <ul id="investimentos" class="fechado">
+                       <li><a href="../investimentos/carteira.html">Carteira</a></li>
+                       <li><a href="../investimentos/indicadoresBolsa.html"> Indicadores</a></li>
+                    </ul>
+            </div>
+            <div class="separador">
+                <a href="../relatorios/relatorio.html">Emitir relatórios</a>
+            </div>
+        </nav>
     </aside>
     <div class="wrapper">
         <header>
@@ -47,7 +63,7 @@
         </header> 
 
         <main>
-            <p> conteudo variado </p>
+            <p> Conteúdo variado </p>
             <!-- Aqui ficarão os conteúdos dos módulos, os quais irão variar-->
         </main>
         <footer>
