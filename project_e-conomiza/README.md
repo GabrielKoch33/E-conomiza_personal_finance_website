@@ -212,7 +212,7 @@ funciona só abrindo o `index.html` no navegador.
   temporárias do sistema ou de editor).
 - **`.env`** — variáveis de ambiente (senhas, chaves de API, etc.). **Nunca**
   compartilhe o conteúdo deste arquivo publicamente.
-- **`.bolt/`** — pasta interna da ferramenta Bolt, não precisa se preocupar
+- **`.bolt`** — pasta interna da ferramenta Bolt, não precisa se preocupar
   com ela.
 
 ---
