@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="src/styles.css" />
+    <title>Controle Financeiro</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Sidebar -->
+      <aside id="sidebar" class="sidebar" data-open="true">
+        <div class="sidebar-header">
+          <button id="sidebar-toggle" class="icon-btn" aria-label="Recolher sidebar" title="Recolher sidebar">
+            <span class="icon" data-icon="panel-left-close"></span>
+          </button>
+          <span class="sidebar-title">Controle Financeiro</span>
+        </div>
+
+        <nav id="sidebar-nav" class="sidebar-nav"></nav>
+
+        <div id="sidebar-footer" class="sidebar-footer"></div>
+      </aside>
+
+      <!-- Conteúdo principal (largura se ajusta à sidebar) -->
+      <div id="main" class="main">
+        <header id="header" class="header">
+          <div class="header-title">
+            <h1 id="module-title">Dashboards</h1>
+          </div>
+          <div class="header-actions">
+            <!-- Conta -->
+            <div class="dropdown">
+              <button id="account-btn" class="icon-btn" aria-label="Conta" title="Conta">
+                <span class="icon" data-icon="circle-user"></span>
+              </button>
+              <div id="account-menu" class="dropdown-menu" data-open="false">
+                <button class="dropdown-item" data-action="perfil">
+                  <span class="icon" data-icon="user"></span>
+                  <span>Perfil</span>
+                </button>
+                <button class="dropdown-item" data-action="sair">
+                  <span class="icon" data-icon="log-out"></span>
+                  <span>Sair</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Configurações -->
+            <div class="dropdown">
+              <button id="settings-btn" class="icon-btn" aria-label="Configurações" title="Configurações">
+                <span class="icon" data-icon="settings"></span>
+              </button>
+              <div id="settings-menu" class="dropdown-menu" data-open="false">
+                <div class="dropdown-section">
+                  <div class="dropdown-row">
+                    <span>Tema</span>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema">
+                      <span class="icon" data-icon="sun"></span>
+                      <span id="theme-label">Claro</span>
+                    </button>
+                  </div>
+                  <p class="dropdown-hint">Mais opções de cores em breve.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main id="content" class="content">
+          <div class="content-placeholder">
+            <h2 id="placeholder-title">Dashboards</h2>
+            <p>Este é o conteúdo do módulo atual. Substitua este placeholder pelas páginas reais do seu app.</p>
+            <div class="placeholder-box">Espaço reservado para o conteúdo do módulo</div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Scripts carregados na ordem de dependência -->
+    <script src="src/icons.js"></script>
+    <script src="src/navigation.js"></script>
+    <script src="src/footer-links.js"></script>
+    <script src="src/app.js"></script>
+  </body>
+</html>

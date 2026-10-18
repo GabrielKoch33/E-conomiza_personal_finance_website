@@ -1,0 +1,6 @@
+{
+  "name": "controle-financeiro",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Casco de app de controle financeiro em HTML, CSS e JavaScript puro, sem build."
+}

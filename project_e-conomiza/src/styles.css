@@ -1,0 +1,537 @@
+/* ============================================================
+   TEMAS — altere as cores da paleta aqui quando decidir.
+   Tokens semanticos: bg, fg, border, etc.
+   ============================================================ */
+
+:root,
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-subtle: #f4f4f5;
+  --bg-emphasized: #e9e9ec;
+  --bg-hover: #f4f4f5;
+
+  --fg: #18181b;
+  --fg-muted: #52525b;
+  --fg-subtle: #a1a1aa;
+
+  --border: #e4e4e7;
+  --border-emphasized: #d4d4d8;
+
+  --accent: #3b82f6;
+  --accent-fg: #ffffff;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --bg: #09090b;
+  --bg-panel: #18181b;
+  --bg-subtle: #27272a;
+  --bg-emphasized: #3f3f46;
+  --bg-hover: #27272a;
+
+  --fg: #fafafa;
+  --fg-muted: #a1a1aa;
+  --fg-subtle: #71717a;
+
+  --border: #27272a;
+  --border-emphasized: #3f3f46;
+
+  --accent: #3b82f6;
+  --accent-fg: #ffffff;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
+   LAYOUT BASE
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 1100;
+  transition: width 0.25s ease;
+}
+
+.sidebar[data-open="false"] {
+  width: 72px;
+}
+
+.sidebar-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar[data-open="false"] .sidebar-title {
+  display: none;
+}
+
+.sidebar-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ============================================================
+   BOTÕES DE ICONE
+   ============================================================ */
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+.icon {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ============================================================
+   ITENS DE NAVEGAÇÃO
+   ============================================================ */
+
+.module-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.module-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+.module-btn.active {
+  background: var(--bg-emphasized);
+  color: var(--fg);
+}
+
+.sidebar[data-open="false"] .module-btn {
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebar[data-open="false"] .module-btn .module-label,
+.sidebar[data-open="false"] .module-btn .module-chevron {
+  display: none;
+}
+
+.module-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.module-btn.expanded .module-chevron {
+  transform: rotate(180deg);
+}
+
+/* Submódulos (colapsáveis) */
+.submodule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px 4px 32px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.submodule-list.open {
+  max-height: 300px;
+}
+
+.sidebar[data-open="false"] .submodule-list {
+  display: none;
+}
+
+.submodule-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: 0.75rem;
+  text-align: left;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.submodule-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+.submodule-btn.active {
+  background: var(--bg-emphasized);
+  color: var(--fg);
+}
+
+.submodule-btn .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ============================================================
+   LINKS DO RODAPÉ
+   ============================================================ */
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.footer-link:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+.sidebar[data-open="false"] .footer-link {
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebar[data-open="false"] .footer-link .footer-label {
+  display: none;
+}
+
+.footer-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   ÁREA PRINCIPAL
+   ============================================================ */
+
+.main {
+  margin-left: 260px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: margin-left 0.25s ease;
+}
+
+.sidebar[data-open="false"] ~ .main {
+  margin-left: 72px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  position: sticky;
+  top: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+  gap: 16px;
+}
+
+.header-title {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header-title h1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================================
+   DROPDOWN (conta e configurações)
+   ============================================================ */
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  z-index: 1200;
+}
+
+.dropdown-menu[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-subtle);
+  color: var(--fg);
+}
+
+.dropdown-item .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.dropdown-section {
+  padding: 12px;
+}
+
+.dropdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--fg);
+}
+
+.dropdown-hint {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: var(--fg-subtle);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--fg);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-emphasized);
+}
+
+.theme-toggle .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ============================================================
+   CONTEÚDO
+   ============================================================ */
+
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.content-placeholder {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.content-placeholder h2 {
+  font-size: 1.875rem;
+  color: var(--fg);
+}
+
+.content-placeholder p {
+  color: var(--fg-muted);
+}
+
+.placeholder-box {
+  width: 100%;
+  height: 200px;
+  border: 1px dashed var(--border-emphasized);
+  background: var(--bg-subtle);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-subtle);
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   TOOLTIP (sidebar recolhida)
+   ============================================================ */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--fg);
+  color: var(--bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1500;
+  pointer-events: none;
+}
