@@ -65,7 +65,8 @@ main {
             color: #ffffff;
 
             /* background-color: #4f46e5; */
-            background-color: #3DA35D;
+            background-color: #F49D37;
+            /* background-color: #3DA35D; */
 
             border: none;
             border-radius: 8px;
@@ -79,11 +80,14 @@ main {
 
         & > button:hover { /*Ao passar o mouse*/
             /* background-color: #4338ca; */
-            background-color: #F49D37;
+            background-color: #3DA35D;
+
         }
 
         & > button:active { /*Enxolhe ao segurar*/
             transform: scale(0.98);
+            background-color: #278e48;
+
         }
 
         & > button:focus-visible { 
