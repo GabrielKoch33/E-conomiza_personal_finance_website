@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-connomiza</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="assets/css/index/index.css">
 </head>
 <body>
+    <!-- sass --watch login.scss:login.css -->
     <main>
         <section class="section_main_form">
-            <form action="/user" method="post">        
+            <form action="/user" method="post">   
+
                 <div class="campos_login">
                     <label for="user_name">Seu nome de usuário: </label>
                     <input 
@@ -19,6 +21,7 @@
                         placeholder="Informe seu usuário:"
                     >
                 </div>
+
                 <div class="campos_login">
                     <label for="user_pw">Sua senha: </label>
                     <input 
@@ -29,12 +32,16 @@
                     >
                 </div>
 
+                <div class="create_forgot_pw">
+                    <a href="">Esqueceu sua senha?</a>
+                    <a class="disable_link"> | </a>
+                    <a href="">Primeiro acesso?</a>
+                </div>
+
                 <button type="submit">Acessar</button>
-
             </form>
-
         </section>
     </main>
-    <script src="login.js"></script>
+    <script src="assets/js/index/index.js"></script>
 </body>
 </html>
