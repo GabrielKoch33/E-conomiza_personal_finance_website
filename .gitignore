@@ -1,4 +1,4 @@
-/assets/carteira_py
+/assets/carteira_py/
 .env
-/.vscode
-/.idea
+.vscode/
+.idea/
