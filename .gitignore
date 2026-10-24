@@ -1,3 +1,4 @@
-/carteira_py
-/.idea
 /.vscode
+/.idea
+/assets/carteira_py
+.env
