@@ -9,7 +9,7 @@
 <body>
     <main>
         <section class="section_main_form">
-            <form action="/user" method="post">   
+            <form id="login_form" action="/user" method="post">   
 
                 <div class="campos_login">
                     <label for="user_name">Seu nome de usuário: </label>
@@ -36,7 +36,7 @@
                 <a class="disable_link"> | </a>
                 <a href="">Primeiro acesso?</a>
             </div>
-            <button type="button">Acessar</button>
+            <button type="button" form="login_form">Acessar</button>
         </section>
     </main>
     <script src="frontend/assets/js/index/index.js"></script>
