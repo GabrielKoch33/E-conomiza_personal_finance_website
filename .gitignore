@@ -1,5 +1,4 @@
-/frontend/assets/carteira_py/
 .env
 .vscode/
 .idea/
-/backend/src/main/java/com/gabriel/prototype/old
+/backend/src/main/java/com/gabriel/prototype/old/
