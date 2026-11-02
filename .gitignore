@@ -1,4 +1,4 @@
 .env
 .vscode/
 .idea/
-/backend/src/main/java/com/gabriel/prototype/old/
+**/old/
