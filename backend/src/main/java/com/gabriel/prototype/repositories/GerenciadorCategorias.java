@@ -1,6 +1,6 @@
-package com.gabriel.economiza.prototype.gerenciador;
+package com.gabriel.prototype.repositories;
 
-import com.gabriel.economiza.prototype.models.Categoria;
+import com.gabriel.prototype.models.Categoria;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.gabriel.economiza.prototype.models;
+package com.gabriel.prototype.models;
 
 /**
  * Não irei implementar funções de excluir e editar categorias nesse 'projeto',
