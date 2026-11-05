@@ -3,23 +3,23 @@ package com.gabriel.prototype.models;
 public class Categoria {
     private final Long    id;
     private final String  nome;
-    private final boolean padrao;
+    private final boolean isPadrao;
 
     public Categoria(Long id, String nome, boolean padrao) {
-        this.id     = id;
-        this.nome   = nome;
-        this.padrao = padrao;
+        this.id       = id;
+        this.nome     = nome;
+        this.isPadrao = padrao;
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public String getNome() {
-        return nome;
+        return this.nome;
     }
 
-    public boolean isPadrao() {
-        return padrao;
+    public boolean getPadrao() {
+        return this.isPadrao;
     }
 }
