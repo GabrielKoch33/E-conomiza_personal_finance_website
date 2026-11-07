@@ -1,4 +1,4 @@
-package com.gabriel.economiza.prototype.exceptions;
+package com.gabriel.prototype.exceptions;
 
 public class CategoriaJaExisteException extends RuntimeException {
     public CategoriaJaExisteException(String message) {
