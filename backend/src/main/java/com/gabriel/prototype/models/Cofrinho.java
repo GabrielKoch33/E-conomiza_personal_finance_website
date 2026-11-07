@@ -94,7 +94,7 @@ public class Cofrinho {
                 throw new DescricaoVaziaException();
             }
 
-            if (this.valorAutoDeposito.compareTo(BigDecimal.ZERO) <= 0)  {
+            if (this.valorAutoDeposito.compareTo(BigDecimal.ZERO) < 0)  {
                 throw new ValorInvalidoException();
             }
 

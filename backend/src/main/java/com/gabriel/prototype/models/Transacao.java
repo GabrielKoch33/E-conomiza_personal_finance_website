@@ -23,8 +23,6 @@ public class Transacao {
     private final Cofrinho      cofrinho;
     private final Usuario       usuario;
 
-    private static final String SEM_DESCRICAO = "Sem descrição";
-
     private Transacao(Builder builder)
     {
         this.id            = builder.id;
@@ -37,6 +35,38 @@ public class Transacao {
         this.usuario       = builder.usuario;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public LocalDate getDataTransacao() {
+        return dataTransacao;
+    }
+
+    public TipoTransacao getTipoTransacao() {
+        return tipoTransacao;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public Cofrinho getCofrinho() {
+        return cofrinho;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     public static class Builder {
         private final Long          id;
         private final BigDecimal    valor;
@@ -44,11 +74,9 @@ public class Transacao {
         private final TipoTransacao tipoTransacao;
         private final Usuario       usuario;
 
-        private String    descricao = Transacao.SEM_DESCRICAO;
-        private Cofrinho  cofrinho;
-        private Categoria categoria;
-
-
+        private String    descricao = "Sem descrição";
+        private Cofrinho  cofrinho  = null;
+        private Categoria categoria = null;
 
         public Builder(Long id, BigDecimal valor,
                        LocalDate dataTransacao, TipoTransacao tipoTransacao,
@@ -91,37 +119,5 @@ public class Transacao {
 
             return new Transacao(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public BigDecimal getValor() {
-        return valor;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public LocalDate getDataTransacao() {
-        return dataTransacao;
-    }
-
-    public TipoTransacao getTipoTransacao() {
-        return tipoTransacao;
-    }
-
-    public Categoria getCategoria() {
-        return categoria;
-    }
-
-    public Cofrinho getCofrinho() {
-        return cofrinho;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
     }
 }
