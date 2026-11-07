@@ -15,13 +15,13 @@ public enum CategoriaPadrao {
     PIX ("Pix"),
     SEM_CATEGORIA ("Sem Categoria");
 
-    private final String DESCRICAO;
+    private final String descricao;
 
     private CategoriaPadrao(String descricao) {
-        this.DESCRICAO = descricao;
+        this.descricao = descricao;
     }
 
-    public String void getDescricao() {
-        return this.DESCRICAO;
+    public String getDescricao() {
+        return this.descricao;
     }
 }

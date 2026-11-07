@@ -77,18 +77,18 @@ public class Transacao {
         }
 
         public Transacao build() {
-            if (this.valor.compareTo(BigDecimal.ZERO) <= 0)
-            {
+            if (this.valor.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new ValorInvalidoException();
             }
-            if (this.dataTransacao.isAfter(LocalDate.now()))
-            {
+
+            if (this.dataTransacao.isAfter(LocalDate.now())) {
                 throw new DataFuturaException();
             }
-            if (this.descricao == null || this.descricao.isBlank())
-            {
+
+            if (this.descricao == null || this.descricao.isBlank()) {
                 throw new DescricaoVaziaException();
             }
+
             return new Transacao(this);
         }
     }
@@ -124,13 +124,4 @@ public class Transacao {
     public Usuario getUsuario() {
         return usuario;
     }
-    /**
-     * Transacao t = new Transacao.Builder(1, -233, 24/03/2026, ENTRADA, Gabriel Koch) -> cria um objeto ja com os campos obrigatórios prontos.
-     *                  .categoria("Saúde")            -> atribui um valor e devolve o objeto com o campo atualizado.
-     *                  .descricao("remedios de acne") -> usa do objeto com o campo atualizado para adiconar mais um método.
-     *                  .build()    -> nosso objeto Builder agora tem todos os métodos passados.
-     *                              -> dentro dele os valores são validados e é passado o Builder para o Transacao extrair os valores ja validados.
-     *
-     * Podemos usar builder.atributo pois classes externas tem acesso a tudo das internas
-     */
 }
