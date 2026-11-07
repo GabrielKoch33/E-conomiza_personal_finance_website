@@ -198,3 +198,85 @@ META: pertence a exatamente um cofrinho; cofrinho pode ter zero ou uma meta
 - Histórico individual de compras e vendas de ativos.
 - Cálculo de rentabilidade de investimentos.
 - Estornos de transações.
+
+
+## 10. Modelagem
+
+Yahoo Finance API
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+enum Operacao {
+  RECEITA
+  DESPESA
+  APLICAÇÃO
+  RETIRADA
+}
+
+table tbtransacao {
+  id smallint [not null, primary key, increment]
+  id_user smallint [not null]
+  id_categoria smallint [not null]
+  id_cofrinho smallint
+  descricao varchar(100)
+  operacao Operacao [not null]
+  valor_movimentado decimal [not null]
+  dt_movimentacao timestamp [not null]
+}
+
+table tbcategoria {
+  id smallint [not null, primary key, increment]
+  descricao varchar(50) [not null]
+  isPadrao boolean [not null]
+  id_user_criador smallint
+}
+
+table tbusuario {
+  id smallint [not null, primary key, increment]
+  nome text [not null]
+  senha password [not null]
+  // saldo atual
+}
+
+table tbcofrinho {
+  id smallint [not null, primary key, increment]
+  nome varchar (30) [not null]
+  descricao text
+  dt_cricao timestamp [not null]
+  //valor_atual decimal [not null]
+  auto_deposito boolean [not null]
+  valor_auto_deposito decimal
+  id_user smallint [not null]
+}
+
+table tbmeta {
+  id integer [not null, primary key, increment]
+  nome_meta varchar(30) [not null]
+  valor_alcancar decimal [not null]
+  id_cofrinho smallint [not null]
+}
+
+table tbativos {
+  id_ativo integer [increment, not null, primary key]
+  id_user integer [not null]
+  banco_comprado text
+  ticker_ativo varchar(10)
+  nome_ativo varchar(50)
+  qtdade_ticker_ativo integer
+}
+
+
+Ref: "tbcofrinho"."id" - "tbmeta"."id_cofrinho"
+
+Ref: "tbusuario"."id" <? "tbtransacao"."id_user"
+
+Ref: "tbusuario"."id" <? "tbcofrinho"."id_user"
+
+Ref: "tbcofrinho"."id" ?<? "tbtransacao"."id_cofrinho"
+
+Ref: "tbcategoria"."id" ?<? "tbtransacao"."id_categoria"
+
+Ref: "tbusuario"."id" ?<? "tbcategoria"."id_user_criador"
+
+Ref: "tbusuario"."id" ?<? "tbativos"."id_user"
+

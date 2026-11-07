@@ -1,4 +1,4 @@
-@use "../sass_colors/colors.scss" as *;
+@use "sass_colors/colors.scss" as *;
 
 *
 {
@@ -7,7 +7,7 @@
   box-sizing: border-box;
 }
 
-body 
+body
 {
     min-height: 100vh; /*100 vh significa o tamanho da tela*/
 
@@ -41,9 +41,9 @@ body
         );
 }
 
-main 
+main
 {
-    flex: 1; 
+    flex: 1;
 
     display: grid; /*Estudar*/
     place-items: center;
@@ -51,7 +51,7 @@ main
     padding: 24px 16px;
 }
 
-.section_main_form 
+.section_main_form
 {
     max-width: 400px; /* Define um tamanho máximo de 400px para a caixa */
     width: 100%;
@@ -65,7 +65,7 @@ main
     border-radius: 14px;
 }
 
-.section_main_form > form 
+.section_main_form > form
 {
     display: flex;
     flex-direction: column;
@@ -80,7 +80,7 @@ main
     gap: 8px;
 }
 
-.campos_login > label 
+.campos_login > label
 {
     font-size: 14px;
     font-weight: 600;
@@ -112,7 +112,7 @@ main
     }
 }
 
-.create_forgot_pw 
+.create_forgot_pw
 {
     display: flex;
     flex-direction: row;
@@ -130,7 +130,7 @@ main
     padding: 0px 5px 0px 5px;
 
     text-decoration: none;
-    color: $cor-placeholder; 
+    color: $cor-placeholder;
 
     &:hover {
         color: $cor-texto-principal;
@@ -144,7 +144,7 @@ main
 }
 
 
-.section_main_form > button 
+.section_main_form > button
 {
     width: 100%;
 
