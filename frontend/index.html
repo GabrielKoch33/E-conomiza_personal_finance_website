@@ -1,44 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-connomiza</title>
-    <link rel="stylesheet" href="assets/css/index.css">
+    <title>Document</title>
 </head>
 <body>
-    <main>
-        <section class="section_main_form">
-            <form id="login_form" action="/user" method="post">
-
-                <div class="campos_login">
-                    <label for="user_name">Seu nome de usuário: </label>
-                    <input
-                        type="text"
-                        name="user_name"
-                        id="user_name"
-                        placeholder="Informe seu usuário:"
-                    >
-                </div>
-
-                <div class="campos_login">
-                    <label for="user_pw">Sua senha: </label>
-                    <input
-                        type="password"
-                        name="user_pw"
-                        id="user_pw"
-                        placeholder="Informe sua senha:"
-                    >
-                </div>
-            </form>
-            <div class="create_forgot_pw">
-                <a href="">Esqueceu sua senha?</a>
-                <a class="disable_link"> | </a>
-                <a href="">Primeiro acesso?</a>
-            </div>
-            <button type="button" form="login_form">Acessar</button>
-        </section>
-    </main>
-    <script src="assets/js/index.js"></script>
+    <script>
+        window.location.href = "/pages/login/login.html";
+    </script>
 </body>
 </html>
+<!-- sass --watch pages:pages styles:styles components:components layout:layout -->
