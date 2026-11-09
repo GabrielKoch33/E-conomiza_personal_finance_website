@@ -202,10 +202,6 @@ META: pertence a exatamente um cofrinho; cofrinho pode ter zero ou uma meta
 
 ## 10. Modelagem
 
-Yahoo Finance API
-
-////////////////////////////////////////////////////////////////////////////////////////
-
 enum Operacao {
   RECEITA
   DESPESA
@@ -280,3 +276,59 @@ Ref: "tbusuario"."id" ?<? "tbcategoria"."id_user_criador"
 
 Ref: "tbusuario"."id" ?<? "tbativos"."id_user"
 
+
+# 11 SCRIPT SQL
+
+-- Database: economiza
+DROP DATABASE IF EXISTS economiza;
+
+CREATE DATABASE economiza
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'pt_BR.UTF-8'
+    LC_CTYPE = 'pt_BR.UTF-8'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+
+CREATE TABLE tbusuarios (
+	id_usu SERIAL PRIMARY KEY NOT NULL,
+	nome_usu VARCHAR(50) NOT NULL,
+	senha_usu TEXT NOT NULL,
+);
+
+CREATE TABLE tbcategorias (
+	id_cat SERIAL PRIMARY KEY NOT NULL,
+	desc_cat VARCHAR(50) NOT NULL
+	is_padrao_cat BOOLEAN NOT NULL,
+	id_criador_usu INTEGER NOT NULL -- ajustar Foreign Key
+);
+
+CREATE TABLE tbinvestimentos (
+	
+);
+
+CREATE TABLE tbinvestimentos_usuarios (
+
+); -- n x n
+
+CREATE TABLE tbcofrinhos (
+
+); -- 1 x 0,1 para metas
+
+CREATE TABLE tbmetas(
+
+); -- 1 x 1 para cofrinhos
+
+CREATE TYPE tipo_operacao AS ENUM (
+	'Receita',
+	'Despesa',
+	'Aplicação',
+	'Saque';
+);
+
+CREATE TABLE tbtransacoes(
+
+);

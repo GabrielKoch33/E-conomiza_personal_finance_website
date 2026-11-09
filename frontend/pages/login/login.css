@@ -24,7 +24,6 @@ main {
   flex: 1;
   display: grid; /*Estudar*/
   place-items: center;
-  padding: 24px 16px;
   height: 100%;
 }
 
@@ -54,11 +53,12 @@ main {
 }
 
 .campos_login > label {
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 600;
 }
 
 .campos_login > input {
+  height: 50px;
   width: 100%;
   padding: 12px;
   font-size: 14px;
@@ -83,7 +83,7 @@ main {
 }
 
 .create_forgot_pw > a {
-  font-size: 13px;
+  font-size: 16px;
   padding: 0px 5px 0px 5px;
   text-decoration: none;
   color: #757575;
@@ -98,10 +98,11 @@ main {
 }
 
 button {
+  height: 50px;
   width: 100%;
   gap: 18px;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 600;
   color: #ffffff;
   background-color: #F49D37;
