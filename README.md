@@ -201,84 +201,6 @@ META: pertence a exatamente um cofrinho; cofrinho pode ter zero ou uma meta
 
 
 ## 10. Modelagem
-
-enum Operacao {
-  RECEITA
-  DESPESA
-  APLICAÇÃO
-  RETIRADA
-}
-
-table tbtransacao {
-  id smallint [not null, primary key, increment]
-  id_user smallint [not null]
-  id_categoria smallint [not null]
-  id_cofrinho smallint
-  descricao varchar(100)
-  operacao Operacao [not null]
-  valor_movimentado decimal [not null]
-  dt_movimentacao timestamp [not null]
-}
-
-table tbcategoria {
-  id smallint [not null, primary key, increment]
-  descricao varchar(50) [not null]
-  isPadrao boolean [not null]
-  id_user_criador smallint
-}
-
-table tbusuario {
-  id smallint [not null, primary key, increment]
-  nome text [not null]
-  senha password [not null]
-  // saldo atual
-}
-
-table tbcofrinho {
-  id smallint [not null, primary key, increment]
-  nome varchar (30) [not null]
-  descricao text
-  dt_cricao timestamp [not null]
-  //valor_atual decimal [not null]
-  auto_deposito boolean [not null]
-  valor_auto_deposito decimal
-  id_user smallint [not null]
-}
-
-table tbmeta {
-  id integer [not null, primary key, increment]
-  nome_meta varchar(30) [not null]
-  valor_alcancar decimal [not null]
-  id_cofrinho smallint [not null]
-}
-
-table tbativos {
-  id_ativo integer [increment, not null, primary key]
-  id_user integer [not null]
-  banco_comprado text
-  ticker_ativo varchar(10)
-  nome_ativo varchar(50)
-  qtdade_ticker_ativo integer
-}
-
-
-Ref: "tbcofrinho"."id" - "tbmeta"."id_cofrinho"
-
-Ref: "tbusuario"."id" <? "tbtransacao"."id_user"
-
-Ref: "tbusuario"."id" <? "tbcofrinho"."id_user"
-
-Ref: "tbcofrinho"."id" ?<? "tbtransacao"."id_cofrinho"
-
-Ref: "tbcategoria"."id" ?<? "tbtransacao"."id_categoria"
-
-Ref: "tbusuario"."id" ?<? "tbcategoria"."id_user_criador"
-
-Ref: "tbusuario"."id" ?<? "tbativos"."id_user"
-
-
-# 11 SCRIPT SQL
-
 -- Database: economiza
 DROP DATABASE IF EXISTS economiza;
 
@@ -296,39 +218,101 @@ CREATE DATABASE economiza
 CREATE TABLE tbusuarios (
 	id_usu SERIAL PRIMARY KEY NOT NULL,
 	nome_usu VARCHAR(50) NOT NULL,
-	senha_usu TEXT NOT NULL,
-);
+	senha_usu TEXT NOT NULL
+); -- OK
 
 CREATE TABLE tbcategorias (
 	id_cat SERIAL PRIMARY KEY NOT NULL,
 	desc_cat VARCHAR(50) NOT NULL
 	is_padrao_cat BOOLEAN NOT NULL,
-	id_criador_usu INTEGER NOT NULL -- ajustar Foreign Key
-);
-
-CREATE TABLE tbinvestimentos (
-	
-);
-
-CREATE TABLE tbinvestimentos_usuarios (
-
-); -- n x n
+	id_criador_usu INTEGER NOT NULL -- Foreign Key
+); -- OK
 
 CREATE TABLE tbcofrinhos (
+	id_cofr
+	id_usu_criador
+	data_criacao_cofr
+	desc_cofr
+	has_auto_deposito
+	valor_auto_deposito
 
-); -- 1 x 0,1 para metas
+); -- OK
 
 CREATE TABLE tbmetas(
+	id_meta
+	nome_meta
+	valor_alvo_meta
+	id_cofrinho
 
-); -- 1 x 1 para cofrinhos
+); -- OK
 
-CREATE TYPE tipo_operacao AS ENUM (
-	'Receita',
-	'Despesa',
-	'Aplicação',
-	'Saque';
+CREATE TABLE tbtransacao_base(
+	id_tran
+	id_usu
+	data_tran
+	valor_tran
+); -- OK
+
+CREATE TABLE tbtran_cofrinho(
+	id_tran_cofr
+	id_tran_base
+	id_cofr
+)
+
+
+CREATE TABLE tbtran_movimentacao(
+	id_tran_mov
+	id_tran_base
+	id_categoria
+	desc_movimentacao
+)
+
+
+CREATE TYPE tipo_investimento AS ENUM (
+	'Renda Fixa',
+	'Renda Variável',
+	'Cripto'
+); 
+
+
+CREATE TABLE tb_investimento (
+	id_investimento
+	id_tran_base
+	tipo tipo_investimento
 );
 
-CREATE TABLE tbtransacoes(
-
+CREATE TYPE subtipo_renda_variavel AS ENUM (
+	'Ação',
+	'FII',
+	'ETF'
 );
+
+CREATE TABLE tbtran_inv_rv (
+	id_tran_inv_rv
+	id_investimento
+	subtipo subtipo_renda_variavel
+	ticker
+	quantidade
+	preco_unitario
+);
+
+CREATE TABLE tbtran_inv_rf (
+	id_tran_inv_rf
+	id_investimento
+	titulo
+	indexador
+	taxa
+	vencimento
+);
+
+CREATE TABLE tbtran_inv_cripto (
+	id_tran_inv_cripto
+	id_investimento
+	simbolo
+	quantidade
+	preco_unitario
+);
+
+
+
+
