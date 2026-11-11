@@ -1,0 +1,134 @@
+-- Database: economiza
+DROP DATABASE IF EXISTS economiza;
+
+CREATE DATABASE economiza
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'pt_BR.UTF-8'
+    LC_CTYPE = 'pt_BR.UTF-8'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+
+/**
+- GENERATED ALWAYS AS IDENTITY : gera automaticamente um valor para a coluna,
+								 se tentarmos forçar um valor dentro do INSERT/UPDATE, uma exceção é gerada.
+- CHAR(n) : O campo permite um valor de tamanho exatamente igual a 'n'.
+- VARCHAR(n) : O campo permite um valor de tamanho variado até 'n', acima dele não é permitido.
+- TEXT : O campo armazena um valor ilimitado de caracteres
+
+**/
+CREATE TABLE tbusuarios (
+	id_usu 				BIGINT GENERATED ALWAYS AS IDENTITY,
+	nome_usu 			VARCHAR(50) NOT NULL CHECK (nome_usu > 0) UNIQUE/*?*/,
+	senha_usu 			TEXT NOT NULL CHECK (senha_usu > 6),
+	CONSTRAINT pk_usuario PRIMARY KEY (id_usu, nome_usu)
+); -- OK
+
+CREATE TABLE tbcategorias (
+	id_cat 				BIGINT GENERATED ALWAYS AS IDENTITY,
+	nome_cat 			VARCHAR(50) NOT NULL CHECK (nome_cat > 0),
+	is_padrao_cat 		BOOLEAN NOT NULL DEFAULT FALSE,
+	id_criador_usu 		BIGINT NOT NULL -- Foreign Key
+	CONSTRAINT pk_categoria PRIMARY KEY (id_cat),
+	CONSTRAINT fk_usuario_criador FOREIGN KEY (id_criador_usu) REFERENCES tbusuarios(id_usu),
+); -- OK
+
+CREATE TABLE tbcofrinhos (
+	id_cofr 			BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_usu_criador 		BIGINT NOT NULL,
+	data_criacao_cofr 	TIMESTAMP NOT NULL,
+	nome_cofr 			VARCHAR(50) NOT NULL CHECK (nome_cofr > 0), 
+	has_auto_deposito   BOOLEAN NOT NULL,
+	valor_auto_deposito NUMERIC (12,2) DEFAULT 0 CHECK (valor_auto_deposito >= 0)
+); -- OK
+
+CREATE TABLE tbmetas(
+	id_meta 			BIGINT GENERATED ALWAYS AS IDENTITY,
+	valor_alvo_meta		NUMERIC (12,2) NOT NULL CHECK (valor_alvo_meta > 0),	    
+	id_cofrinho 		BIGINT NOT NULL UNIQUE
+
+); -- OK
+
+CREATE TABLE tbtransacao_base(
+	id_tran 			BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_usu 				BIGINT NOT NULL,
+	data_tran 			TIMESTAMP NOT NULL,
+	valor_tran 			NUMERIC (12,2) NOT NULL CHECK (valor_tran > 0)
+);
+
+CREATE TABLE tbtran_cofrinho(
+	id_tran_cofr 		BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_tran_base 		BIGINT NOT NULL UNIQUE,
+	id_cofr 		    BIGINT NOT NULL  
+)
+
+
+CREATE TYPE tipo_movimentacao AS ENUM (
+	'Entrada',
+	'Saída'
+)
+
+CREATE TABLE tbtran_movimentacao(
+	id_tran_mov 		BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_tran_base 		BIGINT NOT NULL UNIQUE,
+	id_categoria 		BIGINT NOT NULL,
+	tipo_mov 			tipo_movimentacao NOT NULL,
+	desc_movimentacao   VARCHAR(50) 
+)
+
+
+CREATE TYPE tipo_investimento AS ENUM (
+	'Renda Fixa',
+	'Renda Variável',
+	'Cripto'
+); 
+
+CREATE TABLE tb_investimento (
+	id_investimento BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_tran_base 	BIGINT NOT NULL UNIQUE,
+	tipo_inv     	tipo_investimento NOT NULL
+);
+
+CREATE TYPE tipo_renda_variavel AS ENUM (
+	'Ação',
+	'FII',
+	'ETF'
+);
+
+CREATE TABLE tbtran_inv_rv (
+	id_tran_inv_rv  BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_investimento BIGINT NOT NULL UNIQUE,
+	tipo 		    tipo_renda_variavel NOT NULL,
+	ticker    		CHAR(6) NOT NULL, 
+	quantidade      INTEGER NOT NULL CHECK (quantidade > 0),
+	preco_unitario  NUMERIC (12,2) NOT NULL CHECK (preco_unitario > 0)
+);
+
+CREATE TYPE tipo_indexador AS ENUM (
+	'CDI',
+	'IPCA',
+	'SELIC'
+)
+
+CREATE TABLE tbtran_inv_rf (
+	id_tran_inv_rf 	BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_investimento BIGINT NOT NULL UNIQUE,
+	titulo			VARCHAR(30) NOT NULL,
+	indexador		tipo_indexador NOT NULL,             
+	taxa			NUMERIC(5,2) NOT NULL,
+	vencimento 		DATE NOT NULL CHECK --fazer trigger para validar data posterior a atual)
+);
+
+CREATE TABLE tbtran_inv_cripto (
+	id_tran_inv_cripto  BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_investimento 	BIGINT NOT NULL UNIQUE,
+	ticker				VARCHAR(6) NOT NULL,
+	quantidade			NUMERIC(12,2) NOT NULL CHECK (quantidade > 0), -- o front vai pegar o valor aportado, o preço atual do cripto e converter em qtd
+	valor_aportado		NUMERIC(12,2) NOT NULL CHECK (valor_aportado > 0)		
+);
+-- investimentos terão duas telas:
+-- historico: tabela de registros igual a das outras movimentações.
+-- visualização rápida: blocos que representam cada ativo em forma de card.
