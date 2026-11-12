@@ -21,19 +21,35 @@ CREATE DATABASE economiza
 
 **/
 CREATE TABLE tbusuarios (
-	id_usu 				BIGINT GENERATED ALWAYS AS IDENTITY,
-	nome_usu 			VARCHAR(50) NOT NULL CHECK (nome_usu > 0) UNIQUE/*?*/,
-	senha_usu 			TEXT NOT NULL CHECK (senha_usu > 6),
-	CONSTRAINT pk_usuario PRIMARY KEY (id_usu, nome_usu)
+	id_usu 			BIGINT GENERATED ALWAYS AS IDENTITY,
+	nome_usu 		VARCHAR(100) NOT NULL UNIQUE/*?*/,
+	username_login	VARCHAR(30) NOT NULL,
+	senha_usu 		TEXT NOT NULL,
+	CONSTRAINT pk_usuario
+		PRIMARY KEY (id_usu, nome_usu),
+	CONSTRAINT ck_nome_usuario_invalido
+		CHECK (
+			LENGTH(TRIM(nome_usu)) > 1 
+		),
+	CONSTRAINT ck_username_login_vazio 
+		CHECK (LENGTH(TRIM(user_name_login)) >= 6),
+	CONSTRAINT ck_senha_usuario_vazia
+		CHECK (LENGTH(TRIM(senha_usu)) >= 6)
 ); -- OK
 
 CREATE TABLE tbcategorias (
-	id_cat 				BIGINT GENERATED ALWAYS AS IDENTITY,
-	nome_cat 			VARCHAR(50) NOT NULL CHECK (nome_cat > 0),
-	is_padrao_cat 		BOOLEAN NOT NULL DEFAULT FALSE,
-	id_criador_usu 		BIGINT NOT NULL -- Foreign Key
-	CONSTRAINT pk_categoria PRIMARY KEY (id_cat),
-	CONSTRAINT fk_usuario_criador FOREIGN KEY (id_criador_usu) REFERENCES tbusuarios(id_usu),
+	id_cat 			BIGINT GENERATED ALWAYS AS IDENTITY,
+	nome_cat 		VARCHAR(50) NOT NULL CHECK (LENGTH(TRIM(nome_cat)) >= 2),
+	is_padrao_cat 	BOOLEAN NOT NULL DEFAULT false,
+	id_usu_criador 	BIGINT NOT NULL, /*como definir o user sistema?*/
+	
+	CONSTRAINT pk_categoria 
+		PRIMARY KEY (id_cat),
+	CONSTRAINT fk_usuario_criador 
+		FOREIGN KEY (id_usu_criador) 
+		REFERENCES tbusuarios(id_usu)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 ); -- OK
 
 CREATE TABLE tbcofrinhos (
@@ -41,15 +57,25 @@ CREATE TABLE tbcofrinhos (
 	id_usu_criador 		BIGINT NOT NULL,
 	data_criacao_cofr 	TIMESTAMP NOT NULL,
 	nome_cofr 			VARCHAR(50) NOT NULL CHECK (nome_cofr > 0), 
-	has_auto_deposito   BOOLEAN NOT NULL,
-	valor_auto_deposito NUMERIC (12,2) DEFAULT 0 CHECK (valor_auto_deposito >= 0)
+	valor_auto_deposito NUMERIC (12,2) DEFAULT 0 CHECK (valor_auto_deposito >= 0),
+	has_auto_deposito   BOOLEAN NOT NULL CHECK (
+		(valor_auto_deposito > 0 AND has_auto_deposito = TRUE) OR
+		(valor_auto_deposito = 0 AND has_auto_deposito = FALSE)
+	),
+	CONSTRAINT pk_cofrinho 
+		PRIMARY KEY (id_cofr),
+	CONSTRAINT fk_usuario_criador 
+		FOREIGN KEY (id_usu_criador) REFERENCES tbusuarios(id_usu)
 ); -- OK
 
 CREATE TABLE tbmetas(
 	id_meta 			BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_cofrinho 		BIGINT NOT NULL UNIQUE,
 	valor_alvo_meta		NUMERIC (12,2) NOT NULL CHECK (valor_alvo_meta > 0),	    
-	id_cofrinho 		BIGINT NOT NULL UNIQUE
-
+	CONSTRAINT pk_meta_cofrinho 
+		PRIMARY KEY (id_meta),
+	CONSTRAINT fk_cofrinho
+		FOREIGN KEY (id_cofrinho) REFERENCES tbcofrinho(id_cofr)
 ); -- OK
 
 CREATE TABLE tbtransacao_base(
@@ -57,12 +83,22 @@ CREATE TABLE tbtransacao_base(
 	id_usu 				BIGINT NOT NULL,
 	data_tran 			TIMESTAMP NOT NULL,
 	valor_tran 			NUMERIC (12,2) NOT NULL CHECK (valor_tran > 0)
+	CONSTRAINT pk_tran_base
+		PRIMARY KEY (id_tran),
+	CONSTRAINT fk_usuario
+		FOREIGN KEY (id_usu) REFERENCES tbusuarios(id_usu)
 );
 
-CREATE TABLE tbtran_cofrinho(
+CREATE TABLE tbtransacao_cofrinho(
 	id_tran_cofr 		BIGINT GENERATED ALWAYS AS IDENTITY,
 	id_tran_base 		BIGINT NOT NULL UNIQUE,
-	id_cofr 		    BIGINT NOT NULL  
+	id_cofr 		    BIGINT NOT NULL,
+	CONSTRAINT pk_tran_cofrinho
+		PRIMARY KEY (id_tran_cofr),
+	CONSTRAINT fk_tran_base 
+		FOREIGN KEY (id_tran_base) REFERENCES tbtransacao_base(id_tran),
+	CONSTRAINT fk_cofrinho_destino 
+		FOREIGN KEY (id_cofr) REFERENCES tbcofrinhos(id_cofr)
 )
 
 
@@ -76,7 +112,13 @@ CREATE TABLE tbtran_movimentacao(
 	id_tran_base 		BIGINT NOT NULL UNIQUE,
 	id_categoria 		BIGINT NOT NULL,
 	tipo_mov 			tipo_movimentacao NOT NULL,
-	desc_movimentacao   VARCHAR(50) 
+	desc_movimentacao   VARCHAR(50),
+	CONSTRAINT pk_tran_movimentacao 
+		PRIMARY KEY (id_tran_mov),
+	CONSTRAINT fk_tran_base
+		FOREIGN KEY (id_tran_base) REFERENCES tbtransacaobase(id_tran),
+	CONSTRAINT fk_categoria_movimentacao 
+		FOREIGN KEY (id_categoria) REFERENCES tbcategorias(id_cat)
 )
 
 
@@ -87,9 +129,13 @@ CREATE TYPE tipo_investimento AS ENUM (
 ); 
 
 CREATE TABLE tb_investimento (
-	id_investimento BIGINT GENERATED ALWAYS AS IDENTITY,
+	id_tran_investimento BIGINT GENERATED ALWAYS AS IDENTITY,
 	id_tran_base 	BIGINT NOT NULL UNIQUE,
-	tipo_inv     	tipo_investimento NOT NULL
+	tipo_inv     	tipo_investimento NOT NULL,
+	CONSTRAINT pk_tran_investimento
+		PRIMARY KEY (id_tran_investimento),
+	CONSTRAINT fk_tran_base 
+		FOREIGN KEY (id_tran_base) REFERENCES tbtransacaobase(id_tran)
 );
 
 CREATE TYPE tipo_renda_variavel AS ENUM (
@@ -104,7 +150,11 @@ CREATE TABLE tbtran_inv_rv (
 	tipo 		    tipo_renda_variavel NOT NULL,
 	ticker    		CHAR(6) NOT NULL, 
 	quantidade      INTEGER NOT NULL CHECK (quantidade > 0),
-	preco_unitario  NUMERIC (12,2) NOT NULL CHECK (preco_unitario > 0)
+	preco_unitario  NUMERIC (12,2) NOT NULL CHECK (preco_unitario > 0),
+	CONSTRAINT pk_tran_renda_variavel
+		PRIMARY KEY (id_tran_inv_rv),
+	CONSTRAINT fk_tran_investimento_rv 
+		FOREIGN KEY (id_investimento) REFERENCES tb_investimento(id_tran_investimento)
 );
 
 CREATE TYPE tipo_indexador AS ENUM (
@@ -119,7 +169,11 @@ CREATE TABLE tbtran_inv_rf (
 	titulo			VARCHAR(30) NOT NULL,
 	indexador		tipo_indexador NOT NULL,             
 	taxa			NUMERIC(5,2) NOT NULL,
-	vencimento 		DATE NOT NULL CHECK --fazer trigger para validar data posterior a atual)
+	vencimento 		DATE NOT NULL CHECK, --fazer trigger para validar data posterior a atual)
+	CONSTRAINT pk_tran_renda_fixa 
+		PRIMARY KEY (id_tran_inv_rf),
+	CONSTRAINT fk_tran_investimento_rf 
+		FOREIGN KEY (id_investimento) REFERENCES tb_investimento(id_tran_investimento)
 );
 
 CREATE TABLE tbtran_inv_cripto (
@@ -127,7 +181,11 @@ CREATE TABLE tbtran_inv_cripto (
 	id_investimento 	BIGINT NOT NULL UNIQUE,
 	ticker				VARCHAR(6) NOT NULL,
 	quantidade			NUMERIC(12,2) NOT NULL CHECK (quantidade > 0), -- o front vai pegar o valor aportado, o preço atual do cripto e converter em qtd
-	valor_aportado		NUMERIC(12,2) NOT NULL CHECK (valor_aportado > 0)		
+	valor_aportado		NUMERIC(12,2) NOT NULL CHECK (valor_aportado > 0),
+	CONSTRAINT pk_tran_cripto
+		PRIMARY KEY (id_tran_inv_cripto),
+	CONSTRAINT fk_tran_investimento_cripto 
+		FOREIGN KEY (id_investimento) REFERENCES tb_investimento(id_tran_investimento)
 );
 -- investimentos terão duas telas:
 -- historico: tabela de registros igual a das outras movimentações.
