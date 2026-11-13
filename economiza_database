@@ -1,4 +1,3 @@
--- Database: economiza
 DROP DATABASE IF EXISTS economiza;
 
 CREATE DATABASE economiza
@@ -12,181 +11,329 @@ CREATE DATABASE economiza
     CONNECTION LIMIT = -1
     IS_TEMPLATE = False;
 
+CREATE TYPE tipo_transacao AS ENUM (
+    'Movimentação',
+    'Cofrinho',
+    'Investimento'
+);
+
+CREATE TYPE tipo_movimentacao AS ENUM (
+    'Entrada',
+    'Saída'
+);
+
+CREATE TYPE tipo_investimento AS ENUM (
+    'Renda Fixa',
+    'Renda Variável',
+    'Cripto'
+);
+
+CREATE TYPE tipo_renda_variavel AS ENUM (
+    'Ação',
+    'FII',
+    'ETF'
+);
+
+CREATE TYPE tipo_indexador AS ENUM (
+    'CDI',
+    'IPCA',
+    'SELIC'
+);
+
+CREATE TABLE tbusuarios (
+    id_usu          BIGINT GENERATED ALWAYS AS IDENTITY,
+    nome_usu        VARCHAR(100) NOT NULL,
+    username_login  VARCHAR(30) NOT NULL,
+    senha_usu       TEXT NOT NULL,
+
+    CONSTRAINT pk_usuario
+        PRIMARY KEY (id_usu),
+
+    CONSTRAINT uq_usuario_username
+        UNIQUE (username_login),
+
+    CONSTRAINT ck_nome_usuario_invalido
+        CHECK (LENGTH(TRIM(nome_usu)) >= 2),
+
+    CONSTRAINT ck_username_login_vazio
+        CHECK (LENGTH(TRIM(username_login)) >= 6),
+
+    CONSTRAINT ck_senha_usuario_vazia
+        CHECK (LENGTH(TRIM(senha_usu)) >= 6)
+);
+
+CREATE TABLE tbcategorias (
+    id_cat          BIGINT GENERATED ALWAYS AS IDENTITY,
+    nome_cat        VARCHAR(50) NOT NULL,
+    is_padrao_cat   BOOLEAN NOT NULL DEFAULT FALSE,
+    id_usu_criador  BIGINT NULL,
+
+    CONSTRAINT pk_categoria
+        PRIMARY KEY (id_cat),
+
+    CONSTRAINT fk_usuario_criador
+        FOREIGN KEY (id_usu_criador)
+        REFERENCES tbusuarios(id_usu)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT uq_categoria_usuario
+        UNIQUE (id_usu_criador, nome_cat),
+
+    CONSTRAINT ck_nome_categoria_vazia
+        CHECK (LENGTH(TRIM(nome_cat)) >= 2),
+
+    CONSTRAINT ck_categoria_padrao_ou_usuario
+        CHECK (
+            (is_padrao_cat = TRUE  AND id_usu_criador IS NULL) OR
+            (is_padrao_cat = FALSE AND id_usu_criador IS NOT NULL)
+        )
+);
+
+CREATE TABLE tbcofrinhos (
+    id_cofr             BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_usu_criador      BIGINT NOT NULL,
+    data_criacao_cofr   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    nome_cofr           VARCHAR(50) NOT NULL,
+    valor_auto_deposito NUMERIC(12,2) NOT NULL,
+    has_auto_deposito   BOOLEAN GENERATED ALWAYS AS (valor_auto_deposito > 0) STORED NOT NULL,
+
+    CONSTRAINT pk_cofrinho
+        PRIMARY KEY (id_cofr),
+
+    CONSTRAINT uq_cofrinho_usuario_nome
+        UNIQUE (id_usu_criador, nome_cofr),
+
+    CONSTRAINT fk_usuario_criador
+        FOREIGN KEY (id_usu_criador)
+        REFERENCES tbusuarios(id_usu)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_nome_cofrinho_vazio
+        CHECK (LENGTH(TRIM(nome_cofr)) >= 2),
+
+    CONSTRAINT ck_valor_auto_depo_positivo
+        CHECK (valor_auto_deposito >= 0),
+
+    CONSTRAINT ck_situacao_auto_depo
+        CHECK (
+            (valor_auto_deposito > 0 AND has_auto_deposito = TRUE) OR
+            (valor_auto_deposito = 0 AND has_auto_deposito = FALSE)
+        )
+);
+
+CREATE TABLE tbmetas (
+    id_meta         BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_cofrinho     BIGINT NOT NULL UNIQUE,
+    valor_alvo_meta NUMERIC(12,2) NOT NULL,
+
+    CONSTRAINT pk_meta_cofrinho
+        PRIMARY KEY (id_meta),
+
+    CONSTRAINT fk_cofrinho
+        FOREIGN KEY (id_cofrinho)
+        REFERENCES tbcofrinhos(id_cofr)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_valor_meta_positivo
+        CHECK (valor_alvo_meta > 0)
+);
+
+CREATE TABLE tbtransacao_base (
+    id_tran     BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_usu      BIGINT NOT NULL,
+    tipo_tran   tipo_transacao NOT NULL,
+    data_tran   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    valor_tran  NUMERIC(12,2) NOT NULL,
+
+    CONSTRAINT pk_tran_base
+        PRIMARY KEY (id_tran),
+
+    CONSTRAINT uq_tran_base_id_tipo
+        UNIQUE (id_tran, tipo_tran),
+
+    CONSTRAINT fk_usuario
+        FOREIGN KEY (id_usu)
+        REFERENCES tbusuarios(id_usu)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_valor_tran_positivo
+        CHECK (valor_tran > 0)
+);
+
+CREATE TABLE tbtransacao_cofrinho (
+    id_tran_cofr    BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_tran_base    BIGINT NOT NULL UNIQUE,
+    tipo_tran       tipo_transacao NOT NULL DEFAULT 'Cofrinho',
+    id_cofr         BIGINT NOT NULL,
+
+    CONSTRAINT pk_tran_cofrinho
+        PRIMARY KEY (id_tran_cofr),
+
+    CONSTRAINT ck_tipo_tran_cofrinho
+        CHECK (tipo_tran = 'Cofrinho'),
+
+    CONSTRAINT fk_tran_base
+        FOREIGN KEY (id_tran_base, tipo_tran)
+        REFERENCES tbtransacao_base(id_tran, tipo_tran)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_cofrinho_destino
+        FOREIGN KEY (id_cofr)
+        REFERENCES tbcofrinhos(id_cofr)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE tbtran_movimentacao (
+    id_tran_mov         BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_tran_base        BIGINT NOT NULL UNIQUE,
+    tipo_tran           tipo_transacao NOT NULL DEFAULT 'Movimentação',
+    id_categoria        BIGINT NOT NULL,
+    tipo_mov            tipo_movimentacao NOT NULL,
+    desc_movimentacao   VARCHAR(50),
+
+    CONSTRAINT pk_tran_movimentacao
+        PRIMARY KEY (id_tran_mov),
+
+    CONSTRAINT ck_tipo_tran_movimentacao
+        CHECK (tipo_tran = 'Movimentação'),
+
+    CONSTRAINT fk_tran_base
+        FOREIGN KEY (id_tran_base, tipo_tran)
+        REFERENCES tbtransacao_base(id_tran, tipo_tran)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_categoria_movimentacao
+        FOREIGN KEY (id_categoria)
+        REFERENCES tbcategorias(id_cat)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_desc_mov_nao_vazia
+        CHECK (desc_movimentacao IS NULL OR LENGTH(TRIM(desc_movimentacao)) > 0)
+);
+
+CREATE TABLE tb_investimento (
+    id_tran_investimento    BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_tran_base            BIGINT NOT NULL UNIQUE,
+    tipo_tran               tipo_transacao NOT NULL DEFAULT 'Investimento',
+    tipo_inv                tipo_investimento NOT NULL,
+
+    CONSTRAINT pk_tran_investimento
+        PRIMARY KEY (id_tran_investimento),
+
+    CONSTRAINT uq_investimento_id_tipo
+        UNIQUE (id_tran_investimento, tipo_inv),
+
+    CONSTRAINT ck_tipo_tran_investimento
+        CHECK (tipo_tran = 'Investimento'),
+
+    CONSTRAINT fk_tran_base
+        FOREIGN KEY (id_tran_base, tipo_tran)
+        REFERENCES tbtransacao_base(id_tran, tipo_tran)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE tbtran_inv_rv (
+    id_tran_inv_rv  BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_investimento BIGINT NOT NULL UNIQUE,
+    tipo_inv        tipo_investimento NOT NULL DEFAULT 'Renda Variável',
+    tipo            tipo_renda_variavel NOT NULL,
+    ticker          VARCHAR(10) NOT NULL,
+    quantidade      INTEGER NOT NULL,
+    preco_unitario  NUMERIC(12,2) NOT NULL,
+
+    CONSTRAINT pk_tran_renda_variavel
+        PRIMARY KEY (id_tran_inv_rv),
+
+    CONSTRAINT ck_tipo_inv_rv
+        CHECK (tipo_inv = 'Renda Variável'),
+
+    CONSTRAINT fk_tran_investimento_rv
+        FOREIGN KEY (id_investimento, tipo_inv)
+        REFERENCES tb_investimento(id_tran_investimento, tipo_inv)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_quantidade_rv_positiva
+        CHECK (quantidade > 0),
+
+    CONSTRAINT ck_preco_unitario_rv_positivo
+        CHECK (preco_unitario > 0)
+);
+
+CREATE TABLE tbtran_inv_rf (
+    id_tran_inv_rf  BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_investimento BIGINT NOT NULL UNIQUE,
+    tipo_inv        tipo_investimento NOT NULL DEFAULT 'Renda Fixa',
+    titulo          VARCHAR(30) NOT NULL,
+    indexador       tipo_indexador NOT NULL,
+    taxa            NUMERIC(5,2) NOT NULL,
+    vencimento      DATE NOT NULL,
+
+    CONSTRAINT pk_tran_renda_fixa
+        PRIMARY KEY (id_tran_inv_rf),
+
+    CONSTRAINT ck_tipo_inv_rf
+        CHECK (tipo_inv = 'Renda Fixa'),
+
+    CONSTRAINT fk_tran_investimento_rf
+        FOREIGN KEY (id_investimento, tipo_inv)
+        REFERENCES tb_investimento(id_tran_investimento, tipo_inv)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_titulo_rf_valido
+        CHECK (LENGTH(TRIM(titulo)) >= 2),
+
+    CONSTRAINT ck_taxa_rf_positiva
+        CHECK (taxa > 0)
+);
+
+CREATE TABLE tbtran_inv_cripto (
+    id_tran_inv_cripto  BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_investimento     BIGINT NOT NULL UNIQUE,
+    tipo_inv            tipo_investimento NOT NULL DEFAULT 'Cripto',
+    ticker              VARCHAR(10) NOT NULL,
+    quantidade          NUMERIC(18,8) NOT NULL,
+    valor_aportado      NUMERIC(12,2) NOT NULL,
+
+    CONSTRAINT pk_tran_cripto
+        PRIMARY KEY (id_tran_inv_cripto),
+
+    CONSTRAINT ck_tipo_inv_cripto
+        CHECK (tipo_inv = 'Cripto'),
+
+    CONSTRAINT fk_tran_investimento_cripto
+        FOREIGN KEY (id_investimento, tipo_inv)
+        REFERENCES tb_investimento(id_tran_investimento, tipo_inv)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_ticker_cripto_formato
+        CHECK (ticker ~ '^[A-Z0-9]{2,10}$'),
+
+    CONSTRAINT ck_quantidade_cripto_positiva
+        CHECK (quantidade > 0),
+
+    CONSTRAINT ck_valor_aportado_cripto_positivo
+        CHECK (valor_aportado > 0)
+);
 /**
 - GENERATED ALWAYS AS IDENTITY : gera automaticamente um valor para a coluna,
 								 se tentarmos forçar um valor dentro do INSERT/UPDATE, uma exceção é gerada.
 - CHAR(n) : O campo permite um valor de tamanho exatamente igual a 'n'.
 - VARCHAR(n) : O campo permite um valor de tamanho variado até 'n', acima dele não é permitido.
 - TEXT : O campo armazena um valor ilimitado de caracteres
-
-**/
-CREATE TABLE tbusuarios (
-	id_usu 			BIGINT GENERATED ALWAYS AS IDENTITY,
-	nome_usu 		VARCHAR(100) NOT NULL UNIQUE/*?*/,
-	username_login	VARCHAR(30) NOT NULL,
-	senha_usu 		TEXT NOT NULL,
-	CONSTRAINT pk_usuario
-		PRIMARY KEY (id_usu, nome_usu),
-	CONSTRAINT ck_nome_usuario_invalido
-		CHECK (
-			LENGTH(TRIM(nome_usu)) > 1 
-		),
-	CONSTRAINT ck_username_login_vazio 
-		CHECK (LENGTH(TRIM(user_name_login)) >= 6),
-	CONSTRAINT ck_senha_usuario_vazia
-		CHECK (LENGTH(TRIM(senha_usu)) >= 6)
-); -- OK
-
-CREATE TABLE tbcategorias (
-	id_cat 			BIGINT GENERATED ALWAYS AS IDENTITY,
-	nome_cat 		VARCHAR(50) NOT NULL CHECK (LENGTH(TRIM(nome_cat)) >= 2),
-	is_padrao_cat 	BOOLEAN NOT NULL DEFAULT false,
-	id_usu_criador 	BIGINT NOT NULL, /*como definir o user sistema?*/
-	
-	CONSTRAINT pk_categoria 
-		PRIMARY KEY (id_cat),
-	CONSTRAINT fk_usuario_criador 
-		FOREIGN KEY (id_usu_criador) 
-		REFERENCES tbusuarios(id_usu)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
-); -- OK
-
-CREATE TABLE tbcofrinhos (
-	id_cofr 			BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_usu_criador 		BIGINT NOT NULL,
-	data_criacao_cofr 	TIMESTAMP NOT NULL,
-	nome_cofr 			VARCHAR(50) NOT NULL CHECK (nome_cofr > 0), 
-	valor_auto_deposito NUMERIC (12,2) DEFAULT 0 CHECK (valor_auto_deposito >= 0),
-	has_auto_deposito   BOOLEAN NOT NULL CHECK (
-		(valor_auto_deposito > 0 AND has_auto_deposito = TRUE) OR
-		(valor_auto_deposito = 0 AND has_auto_deposito = FALSE)
-	),
-	CONSTRAINT pk_cofrinho 
-		PRIMARY KEY (id_cofr),
-	CONSTRAINT fk_usuario_criador 
-		FOREIGN KEY (id_usu_criador) REFERENCES tbusuarios(id_usu)
-); -- OK
-
-CREATE TABLE tbmetas(
-	id_meta 			BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_cofrinho 		BIGINT NOT NULL UNIQUE,
-	valor_alvo_meta		NUMERIC (12,2) NOT NULL CHECK (valor_alvo_meta > 0),	    
-	CONSTRAINT pk_meta_cofrinho 
-		PRIMARY KEY (id_meta),
-	CONSTRAINT fk_cofrinho
-		FOREIGN KEY (id_cofrinho) REFERENCES tbcofrinho(id_cofr)
-); -- OK
-
-CREATE TABLE tbtransacao_base(
-	id_tran 			BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_usu 				BIGINT NOT NULL,
-	data_tran 			TIMESTAMP NOT NULL,
-	valor_tran 			NUMERIC (12,2) NOT NULL CHECK (valor_tran > 0)
-	CONSTRAINT pk_tran_base
-		PRIMARY KEY (id_tran),
-	CONSTRAINT fk_usuario
-		FOREIGN KEY (id_usu) REFERENCES tbusuarios(id_usu)
-);
-
-CREATE TABLE tbtransacao_cofrinho(
-	id_tran_cofr 		BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_tran_base 		BIGINT NOT NULL UNIQUE,
-	id_cofr 		    BIGINT NOT NULL,
-	CONSTRAINT pk_tran_cofrinho
-		PRIMARY KEY (id_tran_cofr),
-	CONSTRAINT fk_tran_base 
-		FOREIGN KEY (id_tran_base) REFERENCES tbtransacao_base(id_tran),
-	CONSTRAINT fk_cofrinho_destino 
-		FOREIGN KEY (id_cofr) REFERENCES tbcofrinhos(id_cofr)
-)
-
-
-CREATE TYPE tipo_movimentacao AS ENUM (
-	'Entrada',
-	'Saída'
-)
-
-CREATE TABLE tbtran_movimentacao(
-	id_tran_mov 		BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_tran_base 		BIGINT NOT NULL UNIQUE,
-	id_categoria 		BIGINT NOT NULL,
-	tipo_mov 			tipo_movimentacao NOT NULL,
-	desc_movimentacao   VARCHAR(50),
-	CONSTRAINT pk_tran_movimentacao 
-		PRIMARY KEY (id_tran_mov),
-	CONSTRAINT fk_tran_base
-		FOREIGN KEY (id_tran_base) REFERENCES tbtransacaobase(id_tran),
-	CONSTRAINT fk_categoria_movimentacao 
-		FOREIGN KEY (id_categoria) REFERENCES tbcategorias(id_cat)
-)
-
-
-CREATE TYPE tipo_investimento AS ENUM (
-	'Renda Fixa',
-	'Renda Variável',
-	'Cripto'
-); 
-
-CREATE TABLE tb_investimento (
-	id_tran_investimento BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_tran_base 	BIGINT NOT NULL UNIQUE,
-	tipo_inv     	tipo_investimento NOT NULL,
-	CONSTRAINT pk_tran_investimento
-		PRIMARY KEY (id_tran_investimento),
-	CONSTRAINT fk_tran_base 
-		FOREIGN KEY (id_tran_base) REFERENCES tbtransacaobase(id_tran)
-);
-
-CREATE TYPE tipo_renda_variavel AS ENUM (
-	'Ação',
-	'FII',
-	'ETF'
-);
-
-CREATE TABLE tbtran_inv_rv (
-	id_tran_inv_rv  BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_investimento BIGINT NOT NULL UNIQUE,
-	tipo 		    tipo_renda_variavel NOT NULL,
-	ticker    		CHAR(6) NOT NULL, 
-	quantidade      INTEGER NOT NULL CHECK (quantidade > 0),
-	preco_unitario  NUMERIC (12,2) NOT NULL CHECK (preco_unitario > 0),
-	CONSTRAINT pk_tran_renda_variavel
-		PRIMARY KEY (id_tran_inv_rv),
-	CONSTRAINT fk_tran_investimento_rv 
-		FOREIGN KEY (id_investimento) REFERENCES tb_investimento(id_tran_investimento)
-);
-
-CREATE TYPE tipo_indexador AS ENUM (
-	'CDI',
-	'IPCA',
-	'SELIC'
-)
-
-CREATE TABLE tbtran_inv_rf (
-	id_tran_inv_rf 	BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_investimento BIGINT NOT NULL UNIQUE,
-	titulo			VARCHAR(30) NOT NULL,
-	indexador		tipo_indexador NOT NULL,             
-	taxa			NUMERIC(5,2) NOT NULL,
-	vencimento 		DATE NOT NULL CHECK, --fazer trigger para validar data posterior a atual)
-	CONSTRAINT pk_tran_renda_fixa 
-		PRIMARY KEY (id_tran_inv_rf),
-	CONSTRAINT fk_tran_investimento_rf 
-		FOREIGN KEY (id_investimento) REFERENCES tb_investimento(id_tran_investimento)
-);
-
-CREATE TABLE tbtran_inv_cripto (
-	id_tran_inv_cripto  BIGINT GENERATED ALWAYS AS IDENTITY,
-	id_investimento 	BIGINT NOT NULL UNIQUE,
-	ticker				VARCHAR(6) NOT NULL,
-	quantidade			NUMERIC(12,2) NOT NULL CHECK (quantidade > 0), -- o front vai pegar o valor aportado, o preço atual do cripto e converter em qtd
-	valor_aportado		NUMERIC(12,2) NOT NULL CHECK (valor_aportado > 0),
-	CONSTRAINT pk_tran_cripto
-		PRIMARY KEY (id_tran_inv_cripto),
-	CONSTRAINT fk_tran_investimento_cripto 
-		FOREIGN KEY (id_investimento) REFERENCES tb_investimento(id_tran_investimento)
-);
+- STORED : Salva no Disco
 -- investimentos terão duas telas:
 -- historico: tabela de registros igual a das outras movimentações.
 -- visualização rápida: blocos que representam cada ativo em forma de card.
+**/
