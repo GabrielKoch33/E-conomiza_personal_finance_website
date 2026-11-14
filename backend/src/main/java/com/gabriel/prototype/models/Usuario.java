@@ -2,15 +2,15 @@ package com.gabriel.prototype.models;
 
 public class Usuario {
     private final Long   id;
-    private final String nome;
+    private final String nome ;
     private final String username;
-    private final String senha;
+     private final String senhaHash;
 
-    public Usuario (String nome, String username, String senha) {
-        this.id       = null;
-        this.nome     = nome;
-        this.username = username;
-        this.senha    = senha;
+    public Usuario (String nome, String username, String senhaHash) {
+        this.id        = null;
+        this.nome      = nome ;
+        this.username  = username;
+        this.senhaHash = senhaHash;
     }
 
     public Long getId() {
@@ -26,6 +26,6 @@ public class Usuario {
     }
 
     public String getSenha() {
-        return this.senha;
+        return this.senhaHash;
     }
 }
