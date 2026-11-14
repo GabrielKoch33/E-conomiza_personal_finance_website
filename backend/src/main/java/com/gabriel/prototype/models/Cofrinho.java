@@ -9,21 +9,21 @@ import java.time.LocalDate;
 public class Cofrinho {
     private final Long id;
     private final String nome;
-    private final String descricao;
+    private final String nomeCofrinho;
     private final LocalDate dataCriacao;
-    private final boolean isAutoDepositoOn;
+    private final boolean hasAutoDeposito;
     private final BigDecimal valorAutoDeposito;
-    private final Usuario usuario;
+    private final Usuario usuarioCriador;
 
     private Cofrinho(Builder builder)
     {
         this.id                = builder.id;
         this.nome              = builder.nome;
-        this.descricao         = builder.descricao;
+        this.nomeCofrinho      = builder.nomeCofrinho;
         this.dataCriacao       = builder.dataCriacao;
-        this.isAutoDepositoOn  = builder.isAutoDepositoOn;
+        this.hasAutoDeposito  = builder.hasAutoDeposito;
         this.valorAutoDeposito = builder.valorAutoDeposito;
-        this.usuario           = builder.usuario;
+        this.usuarioCriador    = builder.usuarioCriador;
     }
 
     public Long getId() {
@@ -35,15 +35,15 @@ public class Cofrinho {
     }
 
     public String getDescricao() {
-        return descricao;
+        return nomeCofrinho;
     }
 
     public LocalDate getDataCriacao() {
         return dataCriacao;
     }
 
-    public boolean isAutoDepositoOn() {
-        return isAutoDepositoOn;
+    public boolean hasAutoDeposito() {
+        return hasAutoDeposito;
     }
 
     public BigDecimal getValorAutoDeposito() {
@@ -51,35 +51,35 @@ public class Cofrinho {
     }
 
     public Usuario getUsuario() {
-        return usuario;
+        return usuarioCriador;
     }
 
     public static class Builder {
         private final Long id;
         private final String nome;
         private final LocalDate dataCriacao;
-        private final Usuario usuario;
+        private final Usuario usuarioCriador;
 
-        private String descricao             = "Sem descrição";
-        private boolean isAutoDepositoOn     = false;
+        private String nomeCofrinho          = "Sem descrição";
+        private boolean hasAutoDeposito      = false;
         private BigDecimal valorAutoDeposito = BigDecimal.ZERO;
 
-        public Builder(Long id, String nome,
-                       LocalDate dataCriacao,Usuario usuario)
+        public Builder(String nome,
+                       LocalDate dataCriacao,Usuario usuarioCriador)
         {
-            this.id          = id;
-            this.nome        = nome;
-            this.dataCriacao = dataCriacao;
-            this.usuario     = usuario;
+            this.id             = null;
+            this.nome           = nome;
+            this.dataCriacao    = dataCriacao;
+            this.usuarioCriador = usuarioCriador;
         }
 
-        public Builder descricao(String descricao) {
-            this.descricao = descricao;
+        public Builder nomeCofrinho(String nomeCofrinho) {
+            this.nomeCofrinho = nomeCofrinho;
             return this;
         }
 
-        public Builder hasAutoDeposito(boolean isAutoDepositoOn) {
-            this.isAutoDepositoOn = isAutoDepositoOn;
+        public Builder hasAutoDeposito(boolean hasAutoDeposito) {
+            this.hasAutoDeposito = hasAutoDeposito;
             return this;
         }
 
@@ -90,7 +90,7 @@ public class Cofrinho {
 
         public Cofrinho build() {
 
-            if (this.descricao == null || this.descricao.isBlank()) {
+            if (this.nomeCofrinho == null || this.nomeCofrinho.isBlank()) {
                 throw new DescricaoVaziaException();
             }
 

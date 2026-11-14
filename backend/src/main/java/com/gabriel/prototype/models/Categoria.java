@@ -4,11 +4,13 @@ public class Categoria {
     private final Long    id;
     private final String  nome;
     private final boolean isPadrao;
+    private final Usuario usuarioCriador;
 
-    public Categoria(Long id, String nome, boolean padrao) {
-        this.id       = id;
+    public Categoria(String nome, boolean padrao, Usuario usuarioCriador) {
+        this.id       = null;
         this.nome     = nome;
         this.isPadrao = padrao;
+        this.usuarioCriador = usuarioCriador;
     }
 
     public Long getId() {
@@ -19,7 +21,11 @@ public class Categoria {
         return this.nome;
     }
 
-    public boolean getPadrao() {
+    public boolean isPadrao() {
         return this.isPadrao;
+    }
+
+    public Usuario getUsuarioCriador() {
+        return this.usuarioCriador;
     }
 }

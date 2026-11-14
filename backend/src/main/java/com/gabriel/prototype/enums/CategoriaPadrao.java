@@ -1,4 +1,4 @@
-package com.gabriel.prototype.models.utils;
+package com.gabriel.prototype.enums;
 
 public enum CategoriaPadrao {
     SAUDE ("Saúde"),
