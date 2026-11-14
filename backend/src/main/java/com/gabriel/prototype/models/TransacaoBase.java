@@ -23,23 +23,23 @@ public abstract class TransacaoBase {
         this.valorTransacao   = valorTransacao;
     }
 
-    public Long getId() {
+    protected Long getId() {
         return id;
     }
 
-    public Usuario getUsuarioTransacao() {
+    protected Usuario getUsuarioTransacao() {
         return usuarioTransacao;
     }
 
-    public TipoTransacao getTipoTransacao() {
+    protected TipoTransacao getTipoTransacao() {
         return tipoTransacao;
     }
 
-    public LocalDate getDataTransacao() {
+    protected LocalDate getDataTransacao() {
         return dataTransacao;
     }
 
-    public BigDecimal getValorTransacao() {
+    protected BigDecimal getValorTransacao() {
         return valorTransacao;
     }
 }

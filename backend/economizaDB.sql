@@ -1,0 +1,305 @@
+DROP DATABASE IF EXISTS economiza;
+
+CREATE DATABASE economiza
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'pt_BR.UTF-8'
+    LC_CTYPE = 'pt_BR.UTF-8'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+
+-- ============================================================
+-- ENUMS
+-- ============================================================
+
+CREATE TYPE enum_tipo_operacao AS ENUM (
+    'ENTRADA',
+    'SAIDA'
+);
+
+CREATE TYPE enum_tipo_investimento AS ENUM (
+    'RENDA_FIXA',
+    'RENDA_VARIAVEL',
+    'CRIPTO'
+);
+
+CREATE TYPE enum_tipo_renda_variavel AS ENUM (
+    'ACAO',
+    'FII',
+    'ETF'
+);
+
+CREATE TYPE enum_indexador AS ENUM (
+    'CDI',
+    'IPCA',
+    'SELIC',
+    'PRE_FIXADO'
+);
+
+CREATE TYPE enum_tipo_renda_fixa AS ENUM (
+    'CDB',
+    'LCI',
+    'LCA',
+    'CRI',
+    'CRA',
+    'LC',
+    'LF',
+    'DEBENTURE'
+);
+
+-- ============================================================
+-- TABELAS
+-- ============================================================
+
+CREATE TABLE tb_usuario (
+    id_usuario  BIGINT GENERATED ALWAYS AS IDENTITY,
+    nome        VARCHAR(100) NOT NULL,
+    username    VARCHAR(30) NOT NULL,
+    senha       TEXT NOT NULL,
+
+    CONSTRAINT pk_usuario
+        PRIMARY KEY (id_usuario),
+
+    CONSTRAINT uq_usuario_username
+        UNIQUE (username),
+
+    CONSTRAINT ck_usuario_nome_minimo
+        CHECK (LENGTH(TRIM(nome)) >= 2),
+
+    CONSTRAINT ck_usuario_username_minimo
+        CHECK (LENGTH(TRIM(username)) >= 6)
+);
+
+CREATE TABLE tb_categoria (
+    id_categoria        BIGINT GENERATED ALWAYS AS IDENTITY,
+    nome                VARCHAR(50) NOT NULL,
+    is_padrao           BOOLEAN NOT NULL DEFAULT FALSE,
+    id_usuario_criador  BIGINT NULL,
+
+    CONSTRAINT pk_categoria
+        PRIMARY KEY (id_categoria),
+
+    CONSTRAINT fk_categoria_usuario_criador
+        FOREIGN KEY (id_usuario_criador)
+        REFERENCES tb_usuario(id_usuario)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT uq_categoria_usuario_nome
+        UNIQUE NULLS NOT DISTINCT (id_usuario_criador, nome),
+
+
+    CONSTRAINT ck_categoria_nome_minimo
+        CHECK (LENGTH(TRIM(nome)) >= 2),
+
+    CONSTRAINT ck_categoria_padrao_ou_usuario
+        CHECK (
+            (is_padrao = TRUE  AND id_usuario_criador IS NULL) OR
+            (is_padrao = FALSE AND id_usuario_criador IS NOT NULL)
+        )
+);
+
+CREATE TABLE tb_cofrinho (
+    id_cofrinho         BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_usuario_criador  BIGINT NOT NULL,
+    data_criacao        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    nome                VARCHAR(50) NOT NULL,
+    valor_auto_deposito NUMERIC(12,2) NOT NULL DEFAULT 0,
+    has_auto_deposito   BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT pk_cofrinho
+        PRIMARY KEY (id_cofrinho),
+
+    CONSTRAINT uq_cofrinho_usuario_nome
+        UNIQUE (id_usuario_criador, nome),
+
+    CONSTRAINT fk_cofrinho_usuario_criador
+        FOREIGN KEY (id_usuario_criador)
+        REFERENCES tb_usuario(id_usuario)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_cofrinho_nome_minimo
+        CHECK (LENGTH(TRIM(nome)) >= 2),
+
+    CONSTRAINT ck_cofrinho_valor_auto_deposito_positivo
+        CHECK (valor_auto_deposito >= 0),
+
+    CONSTRAINT ck_cofrinho_situacao_auto_deposito
+        CHECK (
+            (valor_auto_deposito > 0 AND has_auto_deposito = TRUE) OR
+            (valor_auto_deposito = 0 AND has_auto_deposito = FALSE)
+        )
+);
+
+CREATE TABLE tb_meta (
+    id_meta     BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_cofrinho BIGINT NOT NULL UNIQUE,
+    valor_alvo  NUMERIC(12,2) NOT NULL,
+
+    CONSTRAINT pk_meta
+        PRIMARY KEY (id_meta),
+
+    CONSTRAINT fk_meta_cofrinho
+        FOREIGN KEY (id_cofrinho)
+        REFERENCES tb_cofrinho(id_cofrinho)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_meta_valor_alvo_positivo
+        CHECK (valor_alvo > 0)
+);
+
+CREATE TABLE tb_transacao (
+    id_transacao    BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_usuario      BIGINT NOT NULL,
+    tipo_operacao   enum_tipo_operacao NOT NULL,
+    data_transacao  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    valor_transacao NUMERIC(12,2) NOT NULL,
+
+    CONSTRAINT pk_transacao
+        PRIMARY KEY (id_transacao),
+
+    CONSTRAINT uq_transacao_id_tipo_operacao
+        UNIQUE (id_transacao, tipo_operacao),
+
+    CONSTRAINT fk_transacao_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES tb_usuario(id_usuario)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_transacao_valor_positivo
+        CHECK (valor_transacao > 0)
+);
+
+CREATE TABLE tb_transacao_cofrinho (
+    id_transacao_cofrinho   BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao            BIGINT NOT NULL UNIQUE,
+    id_cofrinho             BIGINT NOT NULL,
+
+    CONSTRAINT pk_transacao_cofrinho
+        PRIMARY KEY (id_transacao_cofrinho),
+
+    CONSTRAINT fk_transacao_cofrinho_transacao
+        FOREIGN KEY (id_transacao)
+        REFERENCES tb_transacao(id_transacao)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_transacao_cofrinho_cofrinho
+        FOREIGN KEY (id_cofrinho)
+        REFERENCES tb_cofrinho(id_cofrinho)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE tb_transacao_movimentacao (
+    id_transacao_movimentacao   BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao                BIGINT NOT NULL UNIQUE,
+    id_categoria                BIGINT NOT NULL,
+    descricao                   VARCHAR(50),
+
+    CONSTRAINT pk_transacao_movimentacao
+        PRIMARY KEY (id_transacao_movimentacao),
+
+    CONSTRAINT fk_transacao_movimentacao_transacao
+        FOREIGN KEY (id_transacao)
+        REFERENCES tb_transacao(id_transacao)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_transacao_movimentacao_categoria
+        FOREIGN KEY (id_categoria)
+        REFERENCES tb_categoria(id_categoria)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+
+	CONSTRAINT ck_descricao_transacao_vazia
+		CHECK (descricao IS NULL OR LENGTH(TRIM(descricao)) > 0)
+);
+
+CREATE TABLE tb_transacao_investimento (
+    id_transacao_investimento   BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao                BIGINT NOT NULL UNIQUE,
+    tipo_investimento           enum_tipo_investimento NOT NULL,
+
+    CONSTRAINT pk_transacao_investimento
+        PRIMARY KEY (id_transacao_investimento),
+
+    CONSTRAINT uq_transacao_investimento_id_tipo
+        UNIQUE (id_transacao_investimento, tipo_investimento),
+
+    CONSTRAINT fk_transacao_investimento_transacao
+        FOREIGN KEY (id_transacao)
+        REFERENCES tb_transacao(id_transacao)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE tb_investimento_renda_variavel (
+    id_investimento_renda_variavel  BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao_investimento       BIGINT NOT NULL UNIQUE,
+    tipo_renda_variavel             enum_tipo_renda_variavel NOT NULL,
+    ticker                          VARCHAR(10) NOT NULL,
+    quantidade                      INTEGER NOT NULL,
+
+    CONSTRAINT pk_investimento_renda_variavel
+        PRIMARY KEY (id_investimento_renda_variavel),
+
+    CONSTRAINT fk_investimento_renda_variavel_transacao_investimento
+        FOREIGN KEY (id_transacao_investimento)
+        REFERENCES tb_transacao_investimento(id_transacao_investimento)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_investimento_renda_variavel_quantidade_positiva
+        CHECK (quantidade > 0)
+);
+
+CREATE TABLE tb_investimento_renda_fixa (
+    id_investimento_renda_fixa  BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao_investimento   BIGINT NOT NULL UNIQUE,
+    tipo_renda_fixa             enum_tipo_renda_fixa NOT NULL,
+    nome_titulo                 VARCHAR(30) NOT NULL,
+    indexador                   enum_indexador NOT NULL,
+    taxa                        NUMERIC(5,2) NOT NULL,
+    vencimento                  DATE NOT NULL,
+
+    CONSTRAINT pk_investimento_renda_fixa
+        PRIMARY KEY (id_investimento_renda_fixa),
+
+    CONSTRAINT fk_investimento_renda_fixa_transacao_investimento
+        FOREIGN KEY (id_transacao_investimento)
+        REFERENCES tb_transacao_investimento(id_transacao_investimento)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_investimento_renda_fixa_nome_titulo_minimo
+        CHECK (LENGTH(TRIM(nome_titulo)) >= 2),
+
+    CONSTRAINT ck_investimento_renda_fixa_taxa_positiva
+        CHECK (taxa > 0)
+);
+
+CREATE TABLE tb_investimento_cripto (
+    id_investimento_cripto      BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao_investimento   BIGINT NOT NULL UNIQUE,
+    ticker                      VARCHAR(10) NOT NULL,
+    quantidade                  NUMERIC(18,8) NOT NULL,
+
+    CONSTRAINT pk_investimento_cripto
+        PRIMARY KEY (id_investimento_cripto),
+
+    CONSTRAINT fk_investimento_cripto_transacao_investimento
+        FOREIGN KEY (id_transacao_investimento)
+        REFERENCES tb_transacao_investimento(id_transacao_investimento)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT ck_investimento_cripto_quantidade_positiva
+        CHECK (quantidade > 0)
+);

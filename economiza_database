@@ -271,7 +271,7 @@ CREATE TABLE tb_investimento_renda_fixa (
     id_investimento_renda_fixa  BIGINT GENERATED ALWAYS AS IDENTITY,
     id_transacao_investimento   BIGINT NOT NULL UNIQUE,
     tipo_renda_fixa             enum_tipo_renda_fixa NOT NULL,
-    titulo                      VARCHAR(30) NOT NULL,
+    nome_titulo                 VARCHAR(30) NOT NULL,
     indexador                   enum_indexador NOT NULL,
     taxa                        NUMERIC(5,2) NOT NULL,
     vencimento                  DATE NOT NULL,
@@ -285,8 +285,8 @@ CREATE TABLE tb_investimento_renda_fixa (
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    CONSTRAINT ck_investimento_renda_fixa_titulo_minimo
-        CHECK (LENGTH(TRIM(titulo)) >= 2),
+    CONSTRAINT ck_investimento_renda_fixa_nome_titulo_minimo
+        CHECK (LENGTH(TRIM(nome_titulo)) >= 2),
 
     CONSTRAINT ck_investimento_renda_fixa_taxa_positiva
         CHECK (taxa > 0)

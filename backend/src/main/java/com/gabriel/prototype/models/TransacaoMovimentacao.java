@@ -42,4 +42,29 @@ public class TransacaoMovimentacao extends TransacaoBase {
     public String getDescricao() {
         return descricao;
     }
+
+    @Override
+    public Long getId() {
+        return super.getId();
+    }
+
+    @Override
+    public Usuario getUsuarioTransacao() {
+        return super.getUsuarioTransacao();
+    }
+
+    @Override
+    public TipoTransacao getTipoTransacao() {
+        return super.getTipoTransacao();
+    }
+
+    @Override
+    public LocalDate getDataTransacao() {
+        return super.getDataTransacao();
+    }
+
+    @Override
+    public BigDecimal getValorTransacao() {
+        return super.getValorTransacao();
+    }
 }
