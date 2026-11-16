@@ -6,17 +6,12 @@ import java.sql.SQLException;
 
 public class DBConnectionFactory {
 
-    public static Connection getConnection() {
+    public static Connection getConnection() throws SQLException {
         String url      = "jdbc:postgresql://localhost:5432/economiza";
         String user     = "postgres";
         String password = "250107gks";
 
-        try  {
-            return DriverManager.getConnection(url, user, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return DriverManager.getConnection(url, user, password);
     }
 }
 
