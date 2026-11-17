@@ -3,10 +3,12 @@ package com.gabriel.prototype.repositories;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
+import java.util.Optional;
 
 import com.gabriel.prototype.database.DBConnectionFactory;
 import com.gabriel.prototype.models.Usuario;
+import com.gabriel.prototype.repositories.interfaces.IUsuarioRepository;
 
 /**
  * executeQuery() → SELECT, devolve ResultSet
@@ -14,9 +16,10 @@ import com.gabriel.prototype.models.Usuario;
  * execute() → quando não se sabe o tipo, devolve boolean
  * executeBatch() → executa várias operações de uma vez
  * **/
-public class RepositoryUsuario {
+public class UsuarioRepository implements IUsuarioRepository {
 
-    public static void save (Usuario usuario) {
+    @Override
+    public Usuario save(Usuario usuario) {
         String sql = "INSERT INTO tb_usuario (nome, senha, username) VALUES (?,?,?)";
 
         try (Connection conn = DBConnectionFactory.getConnection();
@@ -27,10 +30,37 @@ public class RepositoryUsuario {
             ps.setString(3, usuario.getUsername());
             // setDouble, setInt, setTimestamp, setBoolean...
             // protege contra SQL Injection
-
             int rows = ps.executeUpdate();
+
+            return usuario;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
+    }
+
+    @Override
+    public Optional<Usuario> edit(Usuario usuario) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Usuario> deleteById(Long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Usuario> findById(Long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Usuario> listAll() {
+        return List.of();
+    }
+
+    @Override
+    public Optional<Usuario> findByUsername(String username) {
+        return Optional.empty();
     }
 }

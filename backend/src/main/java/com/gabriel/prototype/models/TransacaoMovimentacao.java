@@ -1,7 +1,6 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.enums.TipoTransacao;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.gabriel.prototype.models.enums.TipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
