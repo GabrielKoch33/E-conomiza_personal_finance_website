@@ -1,7 +1,9 @@
 package com.gabriel.prototype.models;
 
+import com.gabriel.prototype.exceptions.NomeInvalidoException;
+import com.gabriel.prototype.exceptions.ValorInvalidoException;
 import com.gabriel.prototype.models.enums.TipoInvestimento;
-import com.gabriel.prototype.models.enums.TipoTransacao;
+import com.gabriel.prototype.models.enums.TipoOperacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,17 +11,19 @@ import java.time.LocalDate;
 public class TransacaoInvestimentoCripto extends TransacaoInvestimento {
     private final Long idInvestimentoCripto ;
     private final String ticker ;
-    private final int quantidade;
+    private final double quantidade;
 
-    public TransacaoInvestimentoCripto(Usuario usuarioTransacao, TipoTransacao tipoTransacao,
+    public TransacaoInvestimentoCripto(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
                                        LocalDate dataTransacao, BigDecimal valorTransacao,
                                        TipoInvestimento tipoInvestimento,
-                                       String ticker, int quantidade)
+                                       String ticker, double quantidade)
     {
-        super(usuarioTransacao, tipoTransacao, dataTransacao, valorTransacao, tipoInvestimento);
+        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento);
         this.idInvestimentoCripto = null;
-        this.ticker               = ticker;
-        this.quantidade           = quantidade;
+        if (ticker == null || ticker.isBlank()) throw new NomeInvalidoException();
+        this.ticker = ticker;
+        if (quantidade <= 0) throw new ValorInvalidoException();
+        this.quantidade = quantidade;
     }
 
     public Long getIdInvestimentoCripto() {
@@ -30,42 +34,7 @@ public class TransacaoInvestimentoCripto extends TransacaoInvestimento {
         return ticker;
     }
 
-    public int getQuantidade() {
+    public double getQuantidade() {
         return quantidade;
-    }
-
-    @Override
-    public Long getIdTransacaoInvestimento() {
-        return super.getIdTransacaoInvestimento();
-    }
-
-    @Override
-    public TipoInvestimento getTipoInvestimento() {
-        return super.getTipoInvestimento();
-    }
-
-    @Override
-    public Long getId() {
-        return super.getId();
-    }
-
-    @Override
-    public Usuario getUsuarioTransacao() {
-        return super.getUsuarioTransacao();
-    }
-
-    @Override
-    public TipoTransacao getTipoTransacao() {
-        return super.getTipoTransacao();
-    }
-
-    @Override
-    public LocalDate getDataTransacao() {
-        return super.getDataTransacao();
-    }
-
-    @Override
-    public BigDecimal getValorTransacao() {
-        return super.getValorTransacao();
     }
 }

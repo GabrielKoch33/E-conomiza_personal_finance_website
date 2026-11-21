@@ -1,6 +1,7 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.models.enums.TipoTransacao;
+import com.gabriel.prototype.exceptions.CofrinhoInvalidoException;
+import com.gabriel.prototype.models.enums.TipoOperacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,13 +10,14 @@ public class TransacaoCofrinho extends TransacaoBase {
     private final Long idTransacaoCofrinho;
     private final Cofrinho cofrinhoDestino;
 
-    public TransacaoCofrinho(Usuario usuarioTransacao, TipoTransacao tipoTransacao,
-                             LocalDate dataTransacao, BigDecimal valorTransacao,
+    public TransacaoCofrinho(Usuario usuarioTransacao, LocalDate dataTransacao,
+                             TipoOperacao tipoOperacao, BigDecimal valorTransacao,
                              Cofrinho cofrinhoDestino)
     {
-        super(usuarioTransacao, tipoTransacao, dataTransacao, valorTransacao);
+        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao);
         this.idTransacaoCofrinho = null;
-        this.cofrinhoDestino     = cofrinhoDestino;
+        if (cofrinhoDestino == null) throw new CofrinhoInvalidoException();
+        this.cofrinhoDestino = cofrinhoDestino;
     }
 
     public Long getIdTransacaoCofrinho() {
@@ -24,30 +26,5 @@ public class TransacaoCofrinho extends TransacaoBase {
 
     public Cofrinho getCofrinhoDestino() {
         return cofrinhoDestino;
-    }
-
-    @Override
-    public Long getId() {
-        return super.getId();
-    }
-
-    @Override
-    public Usuario getUsuarioTransacao() {
-        return super.getUsuarioTransacao();
-    }
-
-    @Override
-    public TipoTransacao getTipoTransacao() {
-        return super.getTipoTransacao();
-    }
-
-    @Override
-    public LocalDate getDataTransacao() {
-        return super.getDataTransacao();
-    }
-
-    @Override
-    public BigDecimal getValorTransacao() {
-        return super.getValorTransacao();
     }
 }

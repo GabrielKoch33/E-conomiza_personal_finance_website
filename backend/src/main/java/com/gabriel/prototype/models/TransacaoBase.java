@@ -1,6 +1,9 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.models.enums.TipoTransacao;
+import com.gabriel.prototype.exceptions.DataFuturaException;
+import com.gabriel.prototype.exceptions.ValorInvalidoException;
+import com.gabriel.prototype.models.enums.TipoOperacao;
+import com.gabriel.prototype.exceptions.UsuarioInvalidoException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,38 +11,41 @@ import java.time.LocalDate;
 public abstract class TransacaoBase {
     private final Long id;
     private final Usuario usuarioTransacao;
-    private final TipoTransacao tipoTransacao;
+    private final TipoOperacao tipoOperacao;
     private final LocalDate dataTransacao;
     private final BigDecimal valorTransacao;
 
     protected TransacaoBase(Usuario usuarioTransacao,
-                            TipoTransacao tipoTransacao, LocalDate dataTransacao,
+                            TipoOperacao tipoOperacao, LocalDate dataTransacao,
                             BigDecimal valorTransacao)
     {
-        this.id               = null;
+        this.id = null;
+        this.tipoOperacao = tipoOperacao;
+        if (usuarioTransacao == null) throw new UsuarioInvalidoException();
         this.usuarioTransacao = usuarioTransacao;
-        this.tipoTransacao    = tipoTransacao;
-        this.dataTransacao    = dataTransacao;
-        this.valorTransacao   = valorTransacao;
+        if (dataTransacao.isAfter(LocalDate.now())) throw new DataFuturaException();
+        this.dataTransacao = dataTransacao;
+        if (valorTransacao.compareTo(BigDecimal.ZERO) <= 0) throw new ValorInvalidoException();
+        this.valorTransacao = valorTransacao;
     }
 
-    protected Long getId() {
+    public Long getId() {
         return id;
     }
 
-    protected Usuario getUsuarioTransacao() {
+    public Usuario getUsuarioTransacao() {
         return usuarioTransacao;
     }
 
-    protected TipoTransacao getTipoTransacao() {
-        return tipoTransacao;
+    public TipoOperacao getTipoOperacao() {
+        return tipoOperacao;
     }
 
-    protected LocalDate getDataTransacao() {
+    public LocalDate getDataTransacao() {
         return dataTransacao;
     }
 
-    protected BigDecimal getValorTransacao() {
+    public BigDecimal getValorTransacao() {
         return valorTransacao;
     }
 }

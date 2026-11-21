@@ -1,6 +1,8 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.DescricaoVaziaException;
+import com.gabriel.prototype.exceptions.DataFuturaException;
+import com.gabriel.prototype.exceptions.NomeInvalidoException;
+import com.gabriel.prototype.exceptions.UsuarioInvalidoException;
 import com.gabriel.prototype.exceptions.ValorInvalidoException;
 
 import java.math.BigDecimal;
@@ -9,7 +11,6 @@ import java.time.LocalDate;
 public class Cofrinho {
     private final Long id;
     private final String nome;
-    private final String nomeCofrinho;
     private final LocalDate dataCriacao;
     private final boolean hasAutoDeposito;
     private final BigDecimal valorAutoDeposito;
@@ -19,9 +20,8 @@ public class Cofrinho {
     {
         this.id                = builder.id;
         this.nome              = builder.nome;
-        this.nomeCofrinho      = builder.nomeCofrinho;
         this.dataCriacao       = builder.dataCriacao;
-        this.hasAutoDeposito  = builder.hasAutoDeposito;
+        this.hasAutoDeposito   = builder.hasAutoDeposito;
         this.valorAutoDeposito = builder.valorAutoDeposito;
         this.usuarioCriador    = builder.usuarioCriador;
     }
@@ -32,10 +32,6 @@ public class Cofrinho {
 
     public String getNome() {
         return nome;
-    }
-
-    public String getDescricao() {
-        return nomeCofrinho;
     }
 
     public LocalDate getDataCriacao() {
@@ -60,26 +56,20 @@ public class Cofrinho {
         private final LocalDate dataCriacao;
         private final Usuario usuarioCriador;
 
-        private String nomeCofrinho          = "Sem descrição";
         private boolean hasAutoDeposito      = false;
         private BigDecimal valorAutoDeposito = BigDecimal.ZERO;
 
         public Builder(String nome,
                        LocalDate dataCriacao,Usuario usuarioCriador)
         {
-            this.id             = null;
-            this.nome           = nome;
-            this.dataCriacao    = dataCriacao;
+            this.id = null;
+            this.nome = nome;
+            this.dataCriacao = dataCriacao;
             this.usuarioCriador = usuarioCriador;
         }
 
-        public Builder nomeCofrinho(String nomeCofrinho) {
-            this.nomeCofrinho = nomeCofrinho;
-            return this;
-        }
-
-        public Builder hasAutoDeposito(boolean hasAutoDeposito) {
-            this.hasAutoDeposito = hasAutoDeposito;
+        public Builder hasAutoDeposito() {
+            this.hasAutoDeposito = true;
             return this;
         }
 
@@ -89,14 +79,13 @@ public class Cofrinho {
         }
 
         public Cofrinho build() {
+            if (this.nome == null || this.nome.isBlank()) throw new NomeInvalidoException();
 
-            if (this.nomeCofrinho == null || this.nomeCofrinho.isBlank()) {
-                throw new DescricaoVaziaException();
-            }
+            if (this.dataCriacao == null || this.dataCriacao.isAfter(LocalDate.now())) throw new DataFuturaException();
 
-            if (this.valorAutoDeposito.compareTo(BigDecimal.ZERO) <  0)  {
-                throw new ValorInvalidoException();
-            }
+            if (this.hasAutoDeposito && this.valorAutoDeposito.compareTo(BigDecimal.ZERO) <= 0) throw new ValorInvalidoException();
+
+            if (this.usuarioCriador == null) throw new UsuarioInvalidoException();
 
             return new Cofrinho(this);
         }

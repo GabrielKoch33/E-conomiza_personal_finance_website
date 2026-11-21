@@ -1,6 +1,7 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.models.enums.TipoTransacao;
+import com.gabriel.prototype.exceptions.CategoriaInvalidaException;
+import com.gabriel.prototype.models.enums.TipoOperacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,24 +11,15 @@ public class TransacaoMovimentacao extends TransacaoBase {
     private final Categoria categoriaMovimentacao;
     private final String descricao;
 
-    public TransacaoMovimentacao(Usuario usuarioTransacao, TipoTransacao tipoTransacao,
+    public TransacaoMovimentacao(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
                                  LocalDate dataTransacao, BigDecimal valorTransacao,
                                  Categoria categoriaMovimentacao, String descricao)
     {
-        super(usuarioTransacao, tipoTransacao, dataTransacao, valorTransacao);
+        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao);
         this.idTransacaoMovimentacao = null;
-        this.categoriaMovimentacao   = categoriaMovimentacao;
-        this.descricao               = descricao;
-    }
-
-    public TransacaoMovimentacao (Usuario usuarioTransacao, TipoTransacao tipoTransacao,
-                                 LocalDate dataTransacao, BigDecimal valorTransacao,
-                                 Categoria categoriaMovimentacao)
-    {
-        super(usuarioTransacao, tipoTransacao, dataTransacao, valorTransacao);
-        this.idTransacaoMovimentacao = null;
-        this.categoriaMovimentacao   = categoriaMovimentacao;
-        this.descricao               = null;
+        if (categoriaMovimentacao == null) throw new CategoriaInvalidaException();
+        this.categoriaMovimentacao = categoriaMovimentacao;
+        this.descricao = descricao;
     }
 
     public Long getIdTransacaoMovimentacao() {
@@ -40,30 +32,5 @@ public class TransacaoMovimentacao extends TransacaoBase {
 
     public String getDescricao() {
         return descricao;
-    }
-
-    @Override
-    public Long getId() {
-        return super.getId();
-    }
-
-    @Override
-    public Usuario getUsuarioTransacao() {
-        return super.getUsuarioTransacao();
-    }
-
-    @Override
-    public TipoTransacao getTipoTransacao() {
-        return super.getTipoTransacao();
-    }
-
-    @Override
-    public LocalDate getDataTransacao() {
-        return super.getDataTransacao();
-    }
-
-    @Override
-    public BigDecimal getValorTransacao() {
-        return super.getValorTransacao();
     }
 }

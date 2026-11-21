@@ -1,9 +1,8 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.models.enums.TipoIndexador;
-import com.gabriel.prototype.models.enums.TipoInvestimento;
-import com.gabriel.prototype.models.enums.TipoRendaFixa;
-import com.gabriel.prototype.models.enums.TipoTransacao;
+import com.gabriel.prototype.exceptions.NomeInvalidoException;
+import com.gabriel.prototype.exceptions.ValorInvalidoException;
+import com.gabriel.prototype.models.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,17 +15,20 @@ public class TransacaoInvestimentoRendaFixa extends TransacaoInvestimento {
     private final double taxa;
     private final LocalDate dataVencimento;
 
-    public TransacaoInvestimentoRendaFixa(Usuario usuarioTransacao, TipoTransacao tipoTransacao,
+    public TransacaoInvestimentoRendaFixa(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
                                           LocalDate dataTransacao, BigDecimal valorTransacao,
                                           TipoInvestimento tipoInvestimento, LocalDate dataVencimento,
                                           double taxa, TipoIndexador indexador,
                                           String nomeTitulo, TipoRendaFixa tipoRendaFixa)
     {
-        super(usuarioTransacao, tipoTransacao, dataTransacao, valorTransacao, tipoInvestimento);
+        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento);
         this.idInvestimentoRendaFixa = null;
+        if (dataVencimento.isBefore(LocalDate.now())) throw new RuntimeException();
         this.dataVencimento          = dataVencimento;
+        if (taxa <= 0) throw new ValorInvalidoException();
         this.taxa                    = taxa;
         this.indexador               = indexador;
+        if (nomeTitulo == null || nomeTitulo.isBlank()) throw new NomeInvalidoException();
         this.nomeTitulo              = nomeTitulo;
         this.tipoRendaFixa           = tipoRendaFixa;
     }
@@ -53,40 +55,5 @@ public class TransacaoInvestimentoRendaFixa extends TransacaoInvestimento {
 
     public LocalDate getDataVencimento() {
         return dataVencimento;
-    }
-
-    @Override
-    public Long getIdTransacaoInvestimento() {
-        return super.getIdTransacaoInvestimento();
-    }
-
-    @Override
-    public TipoInvestimento getTipoInvestimento() {
-        return super.getTipoInvestimento();
-    }
-
-    @Override
-    public Long getId() {
-        return super.getId();
-    }
-
-    @Override
-    public Usuario getUsuarioTransacao() {
-        return super.getUsuarioTransacao();
-    }
-
-    @Override
-    public TipoTransacao getTipoTransacao() {
-        return super.getTipoTransacao();
-    }
-
-    @Override
-    public LocalDate getDataTransacao() {
-        return super.getDataTransacao();
-    }
-
-    @Override
-    public BigDecimal getValorTransacao() {
-        return super.getValorTransacao();
     }
 }
