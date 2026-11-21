@@ -1,7 +1,6 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.NomeInvalidoException;
-import com.gabriel.prototype.exceptions.UsuarioInvalidoException;
+import com.gabriel.prototype.exceptions.categoria.NomeCategoriaVazioException;
 
 public class Categoria {
     private final Long id;
@@ -12,7 +11,7 @@ public class Categoria {
     public Categoria(String nome, boolean padrao, Usuario usuarioCriador) {
         this.id = null;
         this.isPadrao = padrao;
-        if (nome == null || nome.isBlank()) throw new NomeInvalidoException();
+        if (nome == null || nome.isBlank()) throw new NomeCategoriaVazioException();
         this.nome = nome;
         if (usuarioCriador == null) throw new UsuarioInvalidoException();
         this.usuarioCriador = usuarioCriador;
