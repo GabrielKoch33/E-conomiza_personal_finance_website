@@ -2,6 +2,9 @@ package com.gabriel.prototype.models;
 
 import com.gabriel.prototype.exceptions.DataFuturaException;
 import com.gabriel.prototype.exceptions.ValorInvalidoException;
+import com.gabriel.prototype.exceptions.cofrinho.UsuarioCriadorInvalidoException;
+import com.gabriel.prototype.exceptions.transacao.DataTransacaoException;
+import com.gabriel.prototype.exceptions.transacao.ValorTransacaoException;
 import com.gabriel.prototype.models.enums.TipoOperacao;
 import com.gabriel.prototype.exceptions.UsuarioInvalidoException;
 
@@ -21,11 +24,11 @@ public abstract class TransacaoBase {
     {
         this.id = null;
         this.tipoOperacao = tipoOperacao;
-        if (usuarioTransacao == null) throw new UsuarioInvalidoException();
+        if (usuarioTransacao == null) throw new UsuarioCriadorInvalidoException();
         this.usuarioTransacao = usuarioTransacao;
-        if (dataTransacao.isAfter(LocalDate.now())) throw new DataFuturaException();
+        if (dataTransacao.isAfter(LocalDate.now())) throw new DataTransacaoException();
         this.dataTransacao = dataTransacao;
-        if (valorTransacao.compareTo(BigDecimal.ZERO) <= 0) throw new ValorInvalidoException();
+        if (valorTransacao.compareTo(BigDecimal.ZERO) <= 0) throw new ValorTransacaoException();
         this.valorTransacao = valorTransacao;
     }
 

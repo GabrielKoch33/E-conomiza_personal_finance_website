@@ -1,9 +1,6 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.DataFuturaException;
-import com.gabriel.prototype.exceptions.NomeInvalidoException;
-import com.gabriel.prototype.exceptions.UsuarioInvalidoException;
-import com.gabriel.prototype.exceptions.ValorInvalidoException;
+import com.gabriel.prototype.exceptions.cofrinho.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -79,13 +76,13 @@ public class Cofrinho {
         }
 
         public Cofrinho build() {
-            if (this.nome == null || this.nome.isBlank()) throw new NomeInvalidoException();
+            if (this.nome == null || this.nome.isBlank()) throw new NomeCofrinhoVazioException();
 
-            if (this.dataCriacao == null || this.dataCriacao.isAfter(LocalDate.now())) throw new DataFuturaException();
+            if (this.dataCriacao == null || this.dataCriacao.isAfter(LocalDate.now())) throw new DataCriacaoException();
 
-            if (this.hasAutoDeposito && this.valorAutoDeposito.compareTo(BigDecimal.ZERO) <= 0) throw new ValorInvalidoException();
+            if (this.hasAutoDeposito && this.valorAutoDeposito.compareTo(BigDecimal.ZERO) <= 0) throw new ValorAutoDepositoException();
 
-            if (this.usuarioCriador == null) throw new UsuarioInvalidoException();
+            if (this.usuarioCriador == null) throw new UsuarioCriadorInvalidoException();
 
             return new Cofrinho(this);
         }

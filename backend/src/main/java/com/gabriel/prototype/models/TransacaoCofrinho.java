@@ -1,6 +1,6 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.CofrinhoInvalidoException;
+import com.gabriel.prototype.exceptions.transacao.CofrinhoDestinoException;
 import com.gabriel.prototype.models.enums.TipoOperacao;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public class TransacaoCofrinho extends TransacaoBase {
     {
         super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao);
         this.idTransacaoCofrinho = null;
-        if (cofrinhoDestino == null) throw new CofrinhoInvalidoException();
+        if (cofrinhoDestino == null) throw new CofrinhoDestinoException();
         this.cofrinhoDestino = cofrinhoDestino;
     }
 

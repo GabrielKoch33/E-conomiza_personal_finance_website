@@ -1,6 +1,6 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.categoria.NomeCategoriaVazioException;
+import com.gabriel.prototype.exceptions.categoria.*;
 
 public class Categoria {
     private final Long id;
@@ -13,7 +13,7 @@ public class Categoria {
         this.isPadrao = padrao;
         if (nome == null || nome.isBlank()) throw new NomeCategoriaVazioException();
         this.nome = nome;
-        if (usuarioCriador == null) throw new UsuarioInvalidoException();
+        if (usuarioCriador == null) throw new UsuarioCriadorInvalidoException();
         this.usuarioCriador = usuarioCriador;
     }
 

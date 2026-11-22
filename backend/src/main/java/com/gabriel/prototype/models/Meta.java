@@ -1,7 +1,7 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.MetaInvalidaException;
-import com.gabriel.prototype.exceptions.ValorInvalidoException;
+
+import com.gabriel.prototype.exceptions.meta.*;
 
 import java.math.BigDecimal;
 
@@ -12,9 +12,9 @@ public class Meta {
 
     public Meta (BigDecimal valorAlvo, Cofrinho cofrinho) {
         this.id = null;
-        if (valorAlvo.compareTo(BigDecimal.ZERO) <= 0) throw new ValorInvalidoException();
+        if (valorAlvo.compareTo(BigDecimal.ZERO) <= 0) throw new ValorAlvoInvalidoException();
         this.valorAlvo = valorAlvo;
-        if (cofrinho == null) throw new MetaInvalidaException();
+        if (cofrinho == null) throw new CofrinhoInexistenteException();
         this.cofrinho  = cofrinho;
     }
 

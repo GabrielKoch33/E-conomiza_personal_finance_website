@@ -1,5 +1,7 @@
 package com.gabriel.prototype.models;
 
+import com.gabriel.prototype.exceptions.transacao.QuantidadeCompradaException;
+import com.gabriel.prototype.exceptions.transacao.TickerInvalidoException;
 import com.gabriel.prototype.models.enums.TipoInvestimento;
 import com.gabriel.prototype.models.enums.TipoOperacao;
 import com.gabriel.prototype.models.enums.TipoRendaVariavel;
@@ -20,9 +22,11 @@ public class TransacaoInvestimentoRendaVariavel extends TransacaoInvestimento {
     {
         super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento);
         this.idInvestimentoRendaVariavel = null;
-        this.tipoRendaVariavel           = tipoRendaVariavel;
-        this.ticker                      = ticker;
-        this.quantidadeComprada          = quantidadeComprada;
+        this.tipoRendaVariavel = tipoRendaVariavel;
+        if (ticker == null || ticker.isBlank()) throw new TickerInvalidoException();
+        this.ticker = ticker;
+        if (quantidadeComprada <= 0) throw new QuantidadeCompradaException();
+        this.quantidadeComprada = quantidadeComprada;
     }
 
     public Long getIdInvestimentoRendaVariavel() {

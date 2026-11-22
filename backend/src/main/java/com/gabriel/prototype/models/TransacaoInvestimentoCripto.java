@@ -2,6 +2,8 @@ package com.gabriel.prototype.models;
 
 import com.gabriel.prototype.exceptions.NomeInvalidoException;
 import com.gabriel.prototype.exceptions.ValorInvalidoException;
+import com.gabriel.prototype.exceptions.transacao.QuantidadeCompradaException;
+import com.gabriel.prototype.exceptions.transacao.TickerInvalidoException;
 import com.gabriel.prototype.models.enums.TipoInvestimento;
 import com.gabriel.prototype.models.enums.TipoOperacao;
 
@@ -20,9 +22,9 @@ public class TransacaoInvestimentoCripto extends TransacaoInvestimento {
     {
         super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento);
         this.idInvestimentoCripto = null;
-        if (ticker == null || ticker.isBlank()) throw new NomeInvalidoException();
+        if (ticker == null || ticker.isBlank()) throw new TickerInvalidoException();
         this.ticker = ticker;
-        if (quantidade <= 0) throw new ValorInvalidoException();
+        if (quantidade <= 0) throw new QuantidadeCompradaException();
         this.quantidade = quantidade;
     }
 

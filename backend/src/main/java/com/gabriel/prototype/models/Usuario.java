@@ -1,8 +1,6 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.NomeInvalidoException;
-import com.gabriel.prototype.exceptions.SenhaFracaException;
-import com.gabriel.prototype.exceptions.UsernameInvalidoException;
+import com.gabriel.prototype.exceptions.usuario.*;
 
 public class Usuario {
     private final Long   id;
@@ -12,7 +10,7 @@ public class Usuario {
 
     public Usuario (String nome, String username, String senha) {
         this.id = null;
-        if (nome == null || nome.isBlank()) throw new NomeInvalidoException("usuário");
+        if (nome == null || nome.isBlank()) throw new NomeUsuarioInvalidoException();
         this.nome = nome ;
         if (username == null || username.isBlank() || username.length() > 30) throw new UsernameInvalidoException();
         this.username = username;

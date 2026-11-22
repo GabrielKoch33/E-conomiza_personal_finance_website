@@ -1,6 +1,7 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.CategoriaInvalidaException;
+import com.gabriel.prototype.exceptions.categoria.*;
+import com.gabriel.prototype.exceptions.transacao.CategoriaInvalidaException;
 import com.gabriel.prototype.models.enums.TipoOperacao;
 
 import java.math.BigDecimal;
