@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.gabriel.prototype.database.DBConnectionFactory;
+import com.gabriel.prototype.exceptions.DataAccessException;
 import com.gabriel.prototype.models.Usuario;
 import com.gabriel.prototype.repositories.interfaces.IUsuarioRepository;
 
@@ -18,24 +19,34 @@ import com.gabriel.prototype.repositories.interfaces.IUsuarioRepository;
  * **/
 public class UsuarioRepository implements IUsuarioRepository {
 
+    /**
+     * Apenas um teste, remover depois
+     * **/
+    public void removerdps () {
+        try {
+           save(new Usuario("Gabriel", "gabrielgamer","abc123"));
+        }
+        catch (DataAccessException e) {
+            System.out.println("teste");
+        }
+    }
+
     @Override
-    public Usuario save(Usuario usuario) {
+    public void save(Usuario usuario) throws DataAccessException {
         String sql = "INSERT INTO tb_usuario (nome, senha, username) VALUES (?,?,?)";
 
         try (Connection conn = DBConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql); )
         {
             ps.setString(1, usuario.getNome());
-            ps.setString(2, usuario.getSenha());
+            ps.setString(2, usuario.getSenhaHash());
             ps.setString(3, usuario.getUsername());
             // setDouble, setInt, setTimestamp, setBoolean...
             // protege contra SQL Injection
             int rows = ps.executeUpdate();
 
-            return usuario;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new DataAccessException(e);
         }
     }
 
