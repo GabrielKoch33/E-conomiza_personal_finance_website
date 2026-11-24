@@ -20,10 +20,26 @@ CREATE TYPE enum_tipo_operacao AS ENUM (
     'SAIDA'
 );
 
+CREATE TYPE enum_meio_de_pagamento AS ENUM (
+    'PIX',
+    'DINHEIRO_VIVO',
+    'TRANSFERENCIA',
+    'DEBITO',
+    'CREDITO',
+    'BOLETO',
+    'CHEQUE'
+);
+
 CREATE TYPE enum_tipo_investimento AS ENUM (
     'RENDA_FIXA',
     'RENDA_VARIAVEL',
     'CRIPTO'
+);
+
+CREATE TYPE enum_tipo_transacao AS ENUM (
+    'MOVIMENTACAO',
+    'COFRINHO',
+    'INVESTIMENTO'
 );
 
 CREATE TYPE enum_tipo_renda_variavel AS ENUM (
@@ -154,17 +170,18 @@ CREATE TABLE tb_meta (
 );
 
 CREATE TABLE tb_transacao (
-    id_transacao    BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_usuario      BIGINT NOT NULL,
-    tipo_operacao   enum_tipo_operacao NOT NULL,
-    data_transacao  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    valor_transacao NUMERIC(12,2) NOT NULL,
+    id_transacao     BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_usuario       BIGINT NOT NULL,
+    tipo_transacao   enum_tipo_transacao NOT NULL,
+    tipo_operacao    enum_tipo_operacao NOT NULL,
+    data_transacao   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    valor_transacao  NUMERIC(12,2) NOT NULL,
 
     CONSTRAINT pk_transacao
         PRIMARY KEY (id_transacao),
 
-    CONSTRAINT uq_transacao_id_tipo_operacao
-        UNIQUE (id_transacao, tipo_operacao),
+    CONSTRAINT uq_transacao_id_tipo_transacao
+        UNIQUE (id_transacao, tipo_transacao),
 
     CONSTRAINT fk_transacao_usuario
         FOREIGN KEY (id_usuario)
@@ -177,16 +194,20 @@ CREATE TABLE tb_transacao (
 );
 
 CREATE TABLE tb_transacao_cofrinho (
-    id_transacao_cofrinho   BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_transacao            BIGINT NOT NULL UNIQUE,
-    id_cofrinho             BIGINT NOT NULL,
+    id_transacao_cofrinho BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao          BIGINT NOT NULL UNIQUE,
+    tipo_transacao        enum_tipo_transacao NOT NULL DEFAULT 'COFRINHO',
+    id_cofrinho           BIGINT NOT NULL,
 
     CONSTRAINT pk_transacao_cofrinho
         PRIMARY KEY (id_transacao_cofrinho),
 
+    CONSTRAINT ck_transacao_cofrinho_tipo
+        CHECK (tipo_transacao = 'COFRINHO'),
+
     CONSTRAINT fk_transacao_cofrinho_transacao
-        FOREIGN KEY (id_transacao)
-        REFERENCES tb_transacao(id_transacao)
+        FOREIGN KEY (id_transacao, tipo_transacao)
+        REFERENCES tb_transacao (id_transacao, tipo_transacao)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
@@ -196,19 +217,39 @@ CREATE TABLE tb_transacao_cofrinho (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+-- O CASCADE do cofrinho só apaga a FILHA. Sem isto, a transação-PAI
+-- ficaria órfã e continuaria entrando no cálculo do saldo.
+-- Este trigger apaga o pai quando a filha de cofrinho é removida.
+CREATE FUNCTION fn_apagar_transacao_pai_cofrinho()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM tb_transacao WHERE id_transacao = OLD.id_transacao;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_apagar_transacao_pai_cofrinho
+    AFTER DELETE ON tb_transacao_cofrinho
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_apagar_transacao_pai_cofrinho();
 
 CREATE TABLE tb_transacao_movimentacao (
-    id_transacao_movimentacao   BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_transacao                BIGINT NOT NULL UNIQUE,
-    id_categoria                BIGINT NOT NULL,
-    descricao                   VARCHAR(50),
+    id_transacao_movimentacao BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao              BIGINT NOT NULL UNIQUE,
+    tipo_transacao            enum_tipo_transacao NOT NULL DEFAULT 'MOVIMENTACAO',
+    id_categoria              BIGINT NOT NULL,
+    tipo_meio_pagamento       enum_meio_de_pagamento NOT NULL,
+    descricao                 VARCHAR(50),
 
     CONSTRAINT pk_transacao_movimentacao
         PRIMARY KEY (id_transacao_movimentacao),
 
+    CONSTRAINT ck_transacao_movimentacao_tipo
+        CHECK (tipo_transacao = 'MOVIMENTACAO'),
+
     CONSTRAINT fk_transacao_movimentacao_transacao
-        FOREIGN KEY (id_transacao)
-        REFERENCES tb_transacao(id_transacao)
+        FOREIGN KEY (id_transacao, tipo_transacao)
+        REFERENCES tb_transacao (id_transacao, tipo_transacao)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
@@ -218,41 +259,50 @@ CREATE TABLE tb_transacao_movimentacao (
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
 
-	CONSTRAINT ck_descricao_transacao_vazia
-		CHECK (descricao IS NULL OR LENGTH(TRIM(descricao)) > 0)
+    CONSTRAINT ck_transacao_movimentacao_descricao_vazia
+        CHECK (descricao IS NULL OR LENGTH(TRIM(descricao)) > 0)
 );
 
 CREATE TABLE tb_transacao_investimento (
-    id_transacao_investimento   BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_transacao                BIGINT NOT NULL UNIQUE,
-    tipo_investimento           enum_tipo_investimento NOT NULL,
+    id_transacao_investimento BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao              BIGINT NOT NULL UNIQUE,
+    tipo_transacao            enum_tipo_transacao NOT NULL DEFAULT 'INVESTIMENTO',
+    tipo_investimento         enum_tipo_investimento NOT NULL,
 
     CONSTRAINT pk_transacao_investimento
         PRIMARY KEY (id_transacao_investimento),
 
+    CONSTRAINT ck_transacao_investimento_tipo
+        CHECK (tipo_transacao = 'INVESTIMENTO'),
+
+    -- Alvo das FKs compostas dos subtipos.
     CONSTRAINT uq_transacao_investimento_id_tipo
         UNIQUE (id_transacao_investimento, tipo_investimento),
 
     CONSTRAINT fk_transacao_investimento_transacao
-        FOREIGN KEY (id_transacao)
-        REFERENCES tb_transacao(id_transacao)
+        FOREIGN KEY (id_transacao, tipo_transacao)
+        REFERENCES tb_transacao (id_transacao, tipo_transacao)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 CREATE TABLE tb_investimento_renda_variavel (
-    id_investimento_renda_variavel  BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_transacao_investimento       BIGINT NOT NULL UNIQUE,
-    tipo_renda_variavel             enum_tipo_renda_variavel NOT NULL,
-    ticker                          VARCHAR(10) NOT NULL,
-    quantidade                      INTEGER NOT NULL,
+    id_investimento_renda_variavel BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao_investimento      BIGINT NOT NULL UNIQUE,
+    tipo_investimento              enum_tipo_investimento NOT NULL DEFAULT 'RENDA_VARIAVEL',
+    tipo_renda_variavel            enum_tipo_renda_variavel NOT NULL,
+    ticker                         VARCHAR(20) NOT NULL,
+    quantidade                     INTEGER NOT NULL,
 
     CONSTRAINT pk_investimento_renda_variavel
         PRIMARY KEY (id_investimento_renda_variavel),
 
-    CONSTRAINT fk_investimento_renda_variavel_transacao_investimento
-        FOREIGN KEY (id_transacao_investimento)
-        REFERENCES tb_transacao_investimento(id_transacao_investimento)
+    CONSTRAINT ck_investimento_renda_variavel_tipo
+        CHECK (tipo_investimento = 'RENDA_VARIAVEL'),
+
+    CONSTRAINT fk_investimento_renda_variavel_investimento
+        FOREIGN KEY (id_transacao_investimento, tipo_investimento)
+        REFERENCES tb_transacao_investimento (id_transacao_investimento, tipo_investimento)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
@@ -261,20 +311,24 @@ CREATE TABLE tb_investimento_renda_variavel (
 );
 
 CREATE TABLE tb_investimento_renda_fixa (
-    id_investimento_renda_fixa  BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_transacao_investimento   BIGINT NOT NULL UNIQUE,
-    tipo_renda_fixa             enum_tipo_renda_fixa NOT NULL,
-    nome_titulo                 VARCHAR(30) NOT NULL,
-    indexador                   enum_indexador NOT NULL,
-    taxa                        NUMERIC(5,2) NOT NULL,
-    vencimento                  DATE NOT NULL,
+    id_investimento_renda_fixa BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao_investimento  BIGINT NOT NULL UNIQUE,
+    tipo_investimento          enum_tipo_investimento NOT NULL DEFAULT 'RENDA_FIXA',
+    tipo_renda_fixa            enum_tipo_renda_fixa NOT NULL,
+    nome_titulo                VARCHAR(100) NOT NULL,
+    indexador                  enum_indexador NOT NULL,
+    taxa                       NUMERIC(5,2) NOT NULL,
+    vencimento                 DATE NOT NULL,
 
     CONSTRAINT pk_investimento_renda_fixa
         PRIMARY KEY (id_investimento_renda_fixa),
 
-    CONSTRAINT fk_investimento_renda_fixa_transacao_investimento
-        FOREIGN KEY (id_transacao_investimento)
-        REFERENCES tb_transacao_investimento(id_transacao_investimento)
+    CONSTRAINT ck_investimento_renda_fixa_tipo
+        CHECK (tipo_investimento = 'RENDA_FIXA'),
+
+    CONSTRAINT fk_investimento_renda_fixa_investimento
+        FOREIGN KEY (id_transacao_investimento, tipo_investimento)
+        REFERENCES tb_transacao_investimento (id_transacao_investimento, tipo_investimento)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
@@ -286,17 +340,21 @@ CREATE TABLE tb_investimento_renda_fixa (
 );
 
 CREATE TABLE tb_investimento_cripto (
-    id_investimento_cripto      BIGINT GENERATED ALWAYS AS IDENTITY,
-    id_transacao_investimento   BIGINT NOT NULL UNIQUE,
-    ticker                      VARCHAR(10) NOT NULL,
-    quantidade                  NUMERIC(18,8) NOT NULL,
+    id_investimento_cripto    BIGINT GENERATED ALWAYS AS IDENTITY,
+    id_transacao_investimento BIGINT NOT NULL UNIQUE,
+    tipo_investimento         enum_tipo_investimento NOT NULL DEFAULT 'CRIPTO',
+    ticker                    VARCHAR(10) NOT NULL,
+    quantidade                NUMERIC(18,8) NOT NULL,
 
     CONSTRAINT pk_investimento_cripto
         PRIMARY KEY (id_investimento_cripto),
 
-    CONSTRAINT fk_investimento_cripto_transacao_investimento
-        FOREIGN KEY (id_transacao_investimento)
-        REFERENCES tb_transacao_investimento(id_transacao_investimento)
+    CONSTRAINT ck_investimento_cripto_tipo
+        CHECK (tipo_investimento = 'CRIPTO'),
+
+    CONSTRAINT fk_investimento_cripto_investimento
+        FOREIGN KEY (id_transacao_investimento, tipo_investimento)
+        REFERENCES tb_transacao_investimento (id_transacao_investimento, tipo_investimento)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
