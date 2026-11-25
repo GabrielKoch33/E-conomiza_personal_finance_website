@@ -1,14 +1,13 @@
 package com.gabriel.prototype.models.enums;
 
-public enum TipoIndexador {
-    SELIC ("Selic"),
-    IPCA ("IPCA"),
-    CDI ("CDI"),
-    PRE_FIXADO ("Pré-Fixado");
+public enum EnumTipoInvestimento {
+    RENDA_FIXA ("Renda Fixa"),
+    RENDA_VARIAVEL ("Renda Variável"),
+    CRIPTO ("Criptomoeda");
 
     private final String descricao;
 
-    TipoIndexador (String descricao) {
+    EnumTipoInvestimento(String descricao) {
         this.descricao = descricao;
     }
 

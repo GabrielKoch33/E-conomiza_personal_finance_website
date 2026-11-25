@@ -1,12 +1,12 @@
 package com.gabriel.prototype.models.enums;
 
-public enum TipoOperacao {
+public enum EnumTipoOperacao {
     ENTRADA ("Entrada"),
     SAIDA ("Saída");
 
     private final String descricao;
 
-    TipoOperacao (String descricao) {
+    EnumTipoOperacao(String descricao) {
         this.descricao = descricao;
     }
 

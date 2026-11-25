@@ -1,5 +1,6 @@
 package com.gabriel.prototype.repositories.interfaces;
 
+import com.gabriel.prototype.exceptions.DataAccessException;
 import com.gabriel.prototype.models.Usuario;
 
 import java.util.Optional;
@@ -14,5 +15,5 @@ import java.util.Optional;
  * a interface 'intermediária' acumula os métodos herdados juntamente com os seus.
  * **/
 public interface IUsuarioRepository extends ICrudRepository<Usuario> {
-    Optional<Usuario> findByUsername(String username);
+    Optional<Usuario> findByUsername(String username) throws DataAccessException;
 }

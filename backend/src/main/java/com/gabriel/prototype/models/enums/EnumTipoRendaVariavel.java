@@ -1,18 +1,13 @@
 package com.gabriel.prototype.models.enums;
 
-public enum TipoRendaFixa {
-    CDB("CDB"),
-    LCI("LCI"),
-    LCA("LCA"),
-    CRI("CRI"),
-    CRA("CRA"),
-    LC("LC"),
-    LF("LF"),
-    DEBENTURE("Debêntures");
+public enum EnumTipoRendaVariavel {
+    ACAO ("Ação"),
+    ETF  ("ETF"),
+    FII  ("FII");
 
     private final String descricao;
 
-    TipoRendaFixa (String descricao) {
+    EnumTipoRendaVariavel(String descricao) {
         this.descricao = descricao;
     }
 

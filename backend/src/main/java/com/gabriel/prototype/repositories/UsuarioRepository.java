@@ -19,17 +19,6 @@ import com.gabriel.prototype.repositories.interfaces.IUsuarioRepository;
  * **/
 public class UsuarioRepository implements IUsuarioRepository {
 
-    /**
-     * Apenas um teste, remover depois
-     * **/
-    public void removerdps () {
-        try {
-           save(new Usuario("Gabriel", "gabrielgamer","abc123"));
-        }
-        catch (DataAccessException e) {
-            System.out.println("teste");
-        }
-    }
 
     @Override
     public void save(Usuario usuario) throws DataAccessException {
@@ -41,8 +30,7 @@ public class UsuarioRepository implements IUsuarioRepository {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getSenhaHash());
             ps.setString(3, usuario.getUsername());
-            // setDouble, setInt, setTimestamp, setBoolean...
-            // protege contra SQL Injection
+
             int rows = ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -51,27 +39,27 @@ public class UsuarioRepository implements IUsuarioRepository {
     }
 
     @Override
-    public Optional<Usuario> edit(Usuario usuario) {
+    public Optional<Usuario> edit(Usuario usuario) throws DataAccessException {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Usuario> deleteById(Long id) {
+    public Optional<Usuario> deleteById(Long id) throws DataAccessException {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Usuario> findById(Long id) {
+    public Optional<Usuario> findById(Long id) throws DataAccessException {
         return Optional.empty();
     }
 
     @Override
-    public List<Usuario> listAll() {
+    public List<Usuario> listAll() throws DataAccessException {
         return List.of();
     }
 
     @Override
-    public Optional<Usuario> findByUsername(String username) {
+    public Optional<Usuario> findByUsername(String username) throws DataAccessException {
         return Optional.empty();
     }
 }

@@ -2,27 +2,28 @@ package com.gabriel.prototype.models;
 
 import com.gabriel.prototype.exceptions.transacao.QuantidadeCompradaException;
 import com.gabriel.prototype.exceptions.transacao.TickerInvalidoException;
-import com.gabriel.prototype.models.enums.TipoInvestimento;
-import com.gabriel.prototype.models.enums.TipoOperacao;
-import com.gabriel.prototype.models.enums.TipoRendaVariavel;
+import com.gabriel.prototype.models.enums.EnumTipoInvestimento;
+import com.gabriel.prototype.models.enums.EnumTipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoRendaVariavel;
+import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class TransacaoInvestimentoRendaVariavel extends TransacaoInvestimento {
     private final Long idInvestimentoRendaVariavel;
-    private final TipoRendaVariavel tipoRendaVariavel;
+    private final EnumTipoRendaVariavel enumTipoRendaVariavel;
     private final String ticker;
     private final int quantidadeComprada;
 
-    public TransacaoInvestimentoRendaVariavel(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
+    public TransacaoInvestimentoRendaVariavel(Long id, Usuario usuarioTransacao, EnumTipoOperacao enumTipoOperacao,
                                               LocalDate dataTransacao, BigDecimal valorTransacao,
-                                              TipoInvestimento tipoInvestimento, TipoRendaVariavel tipoRendaVariavel,
-                                              String ticker, int quantidadeComprada)
+                                              EnumTipoInvestimento tipoInvestimento, EnumTipoRendaVariavel enumTipoRendaVariavel,
+                                              String ticker, int quantidadeComprada, Long idInvestimentoRendaVariavel)
     {
-        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento);
+        super(id, usuarioTransacao, enumTipoOperacao, dataTransacao, valorTransacao, tipoInvestimento, idInvestimentoRendaVariavel);
         this.idInvestimentoRendaVariavel = null;
-        this.tipoRendaVariavel = tipoRendaVariavel;
+        this.enumTipoRendaVariavel = enumTipoRendaVariavel;
         if (ticker == null || ticker.isBlank()) throw new TickerInvalidoException();
         this.ticker = ticker;
         if (quantidadeComprada <= 0) throw new QuantidadeCompradaException();
@@ -33,8 +34,8 @@ public class TransacaoInvestimentoRendaVariavel extends TransacaoInvestimento {
         return idInvestimentoRendaVariavel;
     }
 
-    public TipoRendaVariavel getTipoRendaVariavel() {
-        return tipoRendaVariavel;
+    public EnumTipoRendaVariavel getTipoRendaVariavel() {
+        return enumTipoRendaVariavel;
     }
 
     public String getTicker() {

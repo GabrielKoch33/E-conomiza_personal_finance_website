@@ -1,23 +1,24 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.categoria.*;
 import com.gabriel.prototype.exceptions.transacao.CategoriaInvalidaException;
-import com.gabriel.prototype.models.enums.TipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class TransacaoMovimentacao extends TransacaoBase {
-    private final Long idTransacaoMovimentacao;
+    private Long idTransacaoMovimentacao;
     private final Categoria categoriaMovimentacao;
     private final String descricao;
 
-    public TransacaoMovimentacao(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
+    public TransacaoMovimentacao(Long id, Usuario usuarioTransacao, EnumTipoOperacao enumTipoOperacao,
                                  LocalDate dataTransacao, BigDecimal valorTransacao,
-                                 Categoria categoriaMovimentacao, String descricao)
+                                 Categoria categoriaMovimentacao, String descricao,
+                                 Long idTransacaoMovimentacao)
     {
-        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao);
-        this.idTransacaoMovimentacao = null;
+        super(id, usuarioTransacao, enumTipoOperacao, EnumTipoTransacao.MOVIMENTACAO, dataTransacao, valorTransacao);
+        this.idTransacaoMovimentacao = idTransacaoMovimentacao;
         if (categoriaMovimentacao == null) throw new CategoriaInvalidaException();
         this.categoriaMovimentacao = categoriaMovimentacao;
         this.descricao = descricao;

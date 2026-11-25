@@ -1,13 +1,14 @@
 package com.gabriel.prototype.models.enums;
 
-public enum TipoRendaVariavel {
-    ACAO ("Ação"),
-    ETF  ("ETF"),
-    FII  ("FII");
+public enum EnumTipoIndexador {
+    SELIC ("Selic"),
+    IPCA ("IPCA"),
+    CDI ("CDI"),
+    PRE_FIXADO ("Pré-Fixado");
 
     private final String descricao;
 
-    TipoRendaVariavel (String descricao) {
+    EnumTipoIndexador(String descricao) {
         this.descricao = descricao;
     }
 

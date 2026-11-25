@@ -1,29 +1,29 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.DataFuturaException;
-import com.gabriel.prototype.exceptions.ValorInvalidoException;
 import com.gabriel.prototype.exceptions.cofrinho.UsuarioCriadorInvalidoException;
 import com.gabriel.prototype.exceptions.transacao.DataTransacaoException;
 import com.gabriel.prototype.exceptions.transacao.ValorTransacaoException;
-import com.gabriel.prototype.models.enums.TipoOperacao;
-import com.gabriel.prototype.exceptions.UsuarioInvalidoException;
+import com.gabriel.prototype.models.enums.EnumTipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public abstract class TransacaoBase {
-    private final Long id;
+    private Long id;
     private final Usuario usuarioTransacao;
-    private final TipoOperacao tipoOperacao;
+    private final EnumTipoOperacao enumTipoOperacao;
+    private final EnumTipoTransacao enumTipoTransacao;
     private final LocalDate dataTransacao;
     private final BigDecimal valorTransacao;
 
-    protected TransacaoBase(Usuario usuarioTransacao,
-                            TipoOperacao tipoOperacao, LocalDate dataTransacao,
-                            BigDecimal valorTransacao)
+    protected TransacaoBase(Long id, Usuario usuarioTransacao,
+                            EnumTipoOperacao enumTipoOperacao, EnumTipoTransacao enumTipoTransacao,
+                            LocalDate dataTransacao, BigDecimal valorTransacao)
     {
-        this.id = null;
-        this.tipoOperacao = tipoOperacao;
+        this.id = id;
+        this.enumTipoOperacao = enumTipoOperacao;
+        this.enumTipoTransacao = enumTipoTransacao;
         if (usuarioTransacao == null) throw new UsuarioCriadorInvalidoException();
         this.usuarioTransacao = usuarioTransacao;
         if (dataTransacao.isAfter(LocalDate.now())) throw new DataTransacaoException();
@@ -40,8 +40,13 @@ public abstract class TransacaoBase {
         return usuarioTransacao;
     }
 
-    public TipoOperacao getTipoOperacao() {
-        return tipoOperacao;
+    public EnumTipoOperacao getTipoOperacao() {
+        return enumTipoOperacao;
+    }
+
+
+    public EnumTipoTransacao getTipoTransacao() {
+        return enumTipoTransacao;
     }
 
     public LocalDate getDataTransacao() {

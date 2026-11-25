@@ -1,29 +1,30 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.models.enums.TipoInvestimento;
-import com.gabriel.prototype.models.enums.TipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoInvestimento;
+import com.gabriel.prototype.models.enums.EnumTipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public abstract class TransacaoInvestimento extends TransacaoBase {
     private final Long idTransacaoInvestimento;
-    private final TipoInvestimento tipoInvestimento;
+    private final EnumTipoInvestimento tipoInvestimento;
 
-    protected TransacaoInvestimento(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
+    protected TransacaoInvestimento(Long id, Usuario usuarioTransacao, EnumTipoOperacao enumTipoOperacao,
                                     LocalDate dataTransacao, BigDecimal valorTransacao,
-                                    TipoInvestimento tipoInvestimento)
+                                    EnumTipoInvestimento enumTipoInvestimento, Long idTransacaoInvestimento)
     {
-        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao);
-        this.idTransacaoInvestimento = null;
-        this.tipoInvestimento        = tipoInvestimento;
+        super(id, usuarioTransacao, enumTipoOperacao, EnumTipoTransacao.INVESTIMENTO, dataTransacao, valorTransacao);
+        this.idTransacaoInvestimento = idTransacaoInvestimento;
+        this.tipoInvestimento        = enumTipoInvestimento;
     }
 
     public Long getIdTransacaoInvestimento() {
         return idTransacaoInvestimento;
     }
 
-    public TipoInvestimento getTipoInvestimento() {
+    public EnumTipoInvestimento getTipoInvestimento() {
         return tipoInvestimento;
     }
 }

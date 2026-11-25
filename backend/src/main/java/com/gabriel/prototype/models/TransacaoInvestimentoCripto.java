@@ -1,11 +1,10 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.NomeInvalidoException;
-import com.gabriel.prototype.exceptions.ValorInvalidoException;
 import com.gabriel.prototype.exceptions.transacao.QuantidadeCompradaException;
 import com.gabriel.prototype.exceptions.transacao.TickerInvalidoException;
-import com.gabriel.prototype.models.enums.TipoInvestimento;
-import com.gabriel.prototype.models.enums.TipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoInvestimento;
+import com.gabriel.prototype.models.enums.EnumTipoOperacao;
+import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,13 +14,13 @@ public class TransacaoInvestimentoCripto extends TransacaoInvestimento {
     private final String ticker ;
     private final double quantidade;
 
-    public TransacaoInvestimentoCripto(Usuario usuarioTransacao, TipoOperacao tipoOperacao,
+    public TransacaoInvestimentoCripto(Long id, Usuario usuarioTransacao, EnumTipoOperacao tipoOperacao,
                                        LocalDate dataTransacao, BigDecimal valorTransacao,
-                                       TipoInvestimento tipoInvestimento,
-                                       String ticker, double quantidade)
+                                       EnumTipoInvestimento tipoInvestimento, String ticker,
+                                       double quantidade, Long idTransacaoInvestimento, Long idInvestimentoCripto)
     {
-        super(usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento);
-        this.idInvestimentoCripto = null;
+        super(id, usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento, idTransacaoInvestimento);
+        this.idInvestimentoCripto = idInvestimentoCripto;
         if (ticker == null || ticker.isBlank()) throw new TickerInvalidoException();
         this.ticker = ticker;
         if (quantidade <= 0) throw new QuantidadeCompradaException();
