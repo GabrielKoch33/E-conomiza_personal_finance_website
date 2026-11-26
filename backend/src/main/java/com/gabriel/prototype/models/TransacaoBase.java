@@ -1,32 +1,32 @@
 package com.gabriel.prototype.models;
 
-import com.gabriel.prototype.exceptions.cofrinho.UsuarioCriadorInvalidoException;
 import com.gabriel.prototype.exceptions.transacao.DataTransacaoException;
+import com.gabriel.prototype.exceptions.transacao.UsuarioCriadorException;
 import com.gabriel.prototype.exceptions.transacao.ValorTransacaoException;
 import com.gabriel.prototype.models.enums.EnumTipoOperacao;
 import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public abstract class TransacaoBase {
     private Long id;
     private final Usuario usuarioTransacao;
     private final EnumTipoOperacao enumTipoOperacao;
     private final EnumTipoTransacao enumTipoTransacao;
-    private final LocalDate dataTransacao;
+    private final LocalDateTime dataTransacao;
     private final BigDecimal valorTransacao;
 
     protected TransacaoBase(Long id, Usuario usuarioTransacao,
                             EnumTipoOperacao enumTipoOperacao, EnumTipoTransacao enumTipoTransacao,
-                            LocalDate dataTransacao, BigDecimal valorTransacao)
+                            LocalDateTime dataTransacao, BigDecimal valorTransacao)
     {
         this.id = id;
         this.enumTipoOperacao = enumTipoOperacao;
         this.enumTipoTransacao = enumTipoTransacao;
-        if (usuarioTransacao == null) throw new UsuarioCriadorInvalidoException();
+        if (usuarioTransacao == null) throw new UsuarioCriadorException();
         this.usuarioTransacao = usuarioTransacao;
-        if (dataTransacao.isAfter(LocalDate.now())) throw new DataTransacaoException();
+        if (dataTransacao.isAfter(LocalDateTime.now())) throw new DataTransacaoException();
         this.dataTransacao = dataTransacao;
         if (valorTransacao.compareTo(BigDecimal.ZERO) <= 0) throw new ValorTransacaoException();
         this.valorTransacao = valorTransacao;
@@ -49,7 +49,7 @@ public abstract class TransacaoBase {
         return enumTipoTransacao;
     }
 
-    public LocalDate getDataTransacao() {
+    public LocalDateTime getDataTransacao() {
         return dataTransacao;
     }
 

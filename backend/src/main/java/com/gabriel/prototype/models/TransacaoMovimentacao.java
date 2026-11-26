@@ -5,7 +5,7 @@ import com.gabriel.prototype.models.enums.EnumTipoOperacao;
 import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TransacaoMovimentacao extends TransacaoBase {
     private Long idTransacaoMovimentacao;
@@ -13,7 +13,7 @@ public class TransacaoMovimentacao extends TransacaoBase {
     private final String descricao;
 
     public TransacaoMovimentacao(Long id, Usuario usuarioTransacao, EnumTipoOperacao enumTipoOperacao,
-                                 LocalDate dataTransacao, BigDecimal valorTransacao,
+                                 LocalDateTime dataTransacao, BigDecimal valorTransacao,
                                  Categoria categoriaMovimentacao, String descricao,
                                  Long idTransacaoMovimentacao)
     {

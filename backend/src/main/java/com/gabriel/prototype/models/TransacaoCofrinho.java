@@ -5,27 +5,27 @@ import com.gabriel.prototype.models.enums.EnumTipoOperacao;
 import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TransacaoCofrinho extends TransacaoBase {
     private final Long idTransacaoCofrinho;
-    private final Cofrinho cofrinhoDestino;
+    private final Cofrinho cofrinho;
 
-    public TransacaoCofrinho(Long id, Usuario usuarioTransacao, LocalDate dataTransacao,
+    public TransacaoCofrinho(Long id, Usuario usuarioTransacao, LocalDateTime dataTransacao,
                              EnumTipoOperacao enumTipoOperacao,
-                             BigDecimal valorTransacao, Cofrinho cofrinhoDestino, Long idTransacaoCofrinho)
+                             BigDecimal valorTransacao, Cofrinho cofrinho, Long idTransacaoCofrinho)
     {
         super(id, usuarioTransacao, enumTipoOperacao, EnumTipoTransacao.COFRINHO, dataTransacao, valorTransacao);
         this.idTransacaoCofrinho = idTransacaoCofrinho;
-        if (cofrinhoDestino == null) throw new CofrinhoDestinoException();
-        this.cofrinhoDestino = cofrinhoDestino;
+        if (cofrinho == null) throw new CofrinhoDestinoException();
+        this.cofrinho = cofrinho;
     }
 
     public Long getIdTransacaoCofrinho() {
         return idTransacaoCofrinho;
     }
 
-    public Cofrinho getCofrinhoDestino() {
-        return cofrinhoDestino;
+    public Cofrinho getCofrinho() {
+        return cofrinho;
     }
 }

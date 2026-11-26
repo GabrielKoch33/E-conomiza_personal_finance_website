@@ -7,23 +7,23 @@ import com.gabriel.prototype.models.enums.EnumTipoOperacao;
 import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TransacaoInvestimentoCripto extends TransacaoInvestimento {
     private final Long idInvestimentoCripto ;
     private final String ticker ;
-    private final double quantidade;
+    private final BigDecimal quantidade;
 
-    public TransacaoInvestimentoCripto(Long id, Usuario usuarioTransacao, EnumTipoOperacao tipoOperacao,
-                                       LocalDate dataTransacao, BigDecimal valorTransacao,
-                                       EnumTipoInvestimento tipoInvestimento, String ticker,
-                                       double quantidade, Long idTransacaoInvestimento, Long idInvestimentoCripto)
+    public TransacaoInvestimentoCripto(Long id, Usuario usuarioTransacao,
+                                       EnumTipoOperacao tipoOperacao, LocalDateTime dataTransacao,
+                                       BigDecimal valorTransacao, String ticker,
+                                       BigDecimal quantidade, Long idTransacaoInvestimento, Long idInvestimentoCripto)
     {
-        super(id, usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, tipoInvestimento, idTransacaoInvestimento);
+        super(id, usuarioTransacao, tipoOperacao, dataTransacao, valorTransacao, EnumTipoInvestimento.CRIPTO, idTransacaoInvestimento);
         this.idInvestimentoCripto = idInvestimentoCripto;
-        if (ticker == null || ticker.isBlank()) throw new TickerInvalidoException();
+        if (ticker == null || ticker.isBlank() || ticker.length() > 10) throw new TickerInvalidoException();
         this.ticker = ticker;
-        if (quantidade <= 0) throw new QuantidadeCompradaException();
+        if (quantidade.compareTo(BigDecimal.ZERO) <= 0) throw new QuantidadeCompradaException();
         this.quantidade = quantidade;
     }
 
@@ -35,7 +35,7 @@ public class TransacaoInvestimentoCripto extends TransacaoInvestimento {
         return ticker;
     }
 
-    public double getQuantidade() {
+    public BigDecimal getQuantidade() {
         return quantidade;
     }
 }

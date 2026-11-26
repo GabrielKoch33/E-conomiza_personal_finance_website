@@ -6,7 +6,7 @@ import com.gabriel.prototype.exceptions.transacao.TaxaTituloInvalidaException;
 import com.gabriel.prototype.models.enums.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TransacaoInvestimentoRendaFixa extends TransacaoInvestimento {
     private final Long idInvestimentoRendaFixa;
@@ -14,20 +14,21 @@ public class TransacaoInvestimentoRendaFixa extends TransacaoInvestimento {
     private final String nomeTitulo;
     private final EnumTipoIndexador indexador;
     private final double taxa;
-    private final LocalDate dataVencimento;
+    private final LocalDateTime dataVencimento;
 
     public TransacaoInvestimentoRendaFixa(Long id, Usuario usuarioTransacao, EnumTipoOperacao enumTipoOperacao,
-                                          LocalDate dataTransacao, BigDecimal valorTransacao,
-                                          EnumTipoInvestimento tipoInvestimento, LocalDate dataVencimento,
+                                          LocalDateTime dataTransacao, BigDecimal valorTransacao,
+                                          LocalDateTime dataVencimento,
                                           double taxa, EnumTipoIndexador indexador,
                                           String nomeTitulo, EnumTipoRendaFixa enumTipoRendaFixa, Long idTransacaoInvestimento,
                                           Long idInvestimentoRendaFixa)
     {
-        super(id, usuarioTransacao, enumTipoOperacao, dataTransacao, valorTransacao, tipoInvestimento, idTransacaoInvestimento);
+        super(id, usuarioTransacao, enumTipoOperacao, dataTransacao, valorTransacao, EnumTipoInvestimento.RENDA_FIXA, idTransacaoInvestimento);
         this.idInvestimentoRendaFixa = idInvestimentoRendaFixa;
         this.indexador = indexador;
         this.enumTipoRendaFixa = enumTipoRendaFixa;
-        if (dataVencimento.isBefore(LocalDate.now())) throw new DataVencimentoException();
+
+        if (dataVencimento.isBefore(LocalDateTime.now())) throw new DataVencimentoException();
         this.dataVencimento = dataVencimento;
         if (taxa <= 0) throw new TaxaTituloInvalidaException();
         this.taxa = taxa;
@@ -55,7 +56,7 @@ public class TransacaoInvestimentoRendaFixa extends TransacaoInvestimento {
         return taxa;
     }
 
-    public LocalDate getDataVencimento() {
+    public LocalDateTime getDataVencimento() {
         return dataVencimento;
     }
 }

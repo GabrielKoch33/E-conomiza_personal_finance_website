@@ -8,7 +8,7 @@ import com.gabriel.prototype.models.enums.EnumTipoRendaVariavel;
 import com.gabriel.prototype.models.enums.EnumTipoTransacao;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TransacaoInvestimentoRendaVariavel extends TransacaoInvestimento {
     private final Long idInvestimentoRendaVariavel;
@@ -17,14 +17,16 @@ public class TransacaoInvestimentoRendaVariavel extends TransacaoInvestimento {
     private final int quantidadeComprada;
 
     public TransacaoInvestimentoRendaVariavel(Long id, Usuario usuarioTransacao, EnumTipoOperacao enumTipoOperacao,
-                                              LocalDate dataTransacao, BigDecimal valorTransacao,
-                                              EnumTipoInvestimento tipoInvestimento, EnumTipoRendaVariavel enumTipoRendaVariavel,
-                                              String ticker, int quantidadeComprada, Long idInvestimentoRendaVariavel)
+                                              LocalDateTime dataTransacao, BigDecimal valorTransacao,
+                                              EnumTipoRendaVariavel enumTipoRendaVariavel,
+                                              String ticker, int quantidadeComprada,
+                                              Long idTransacaoInvestimento, Long idInvestimentoRendaVariavel
+                                              )
     {
-        super(id, usuarioTransacao, enumTipoOperacao, dataTransacao, valorTransacao, tipoInvestimento, idInvestimentoRendaVariavel);
-        this.idInvestimentoRendaVariavel = null;
+        super(id, usuarioTransacao, enumTipoOperacao, dataTransacao, valorTransacao, EnumTipoInvestimento.RENDA_VARIAVEL, idTransacaoInvestimento);
+        this.idInvestimentoRendaVariavel = idInvestimentoRendaVariavel;
         this.enumTipoRendaVariavel = enumTipoRendaVariavel;
-        if (ticker == null || ticker.isBlank()) throw new TickerInvalidoException();
+        if (ticker == null || ticker.isBlank() || ticker.length() > 20) throw new TickerInvalidoException();
         this.ticker = ticker;
         if (quantidadeComprada <= 0) throw new QuantidadeCompradaException();
         this.quantidadeComprada = quantidadeComprada;

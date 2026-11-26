@@ -3,12 +3,12 @@ package com.gabriel.prototype.models;
 import com.gabriel.prototype.exceptions.cofrinho.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Cofrinho {
     private final Long id;
     private final String nome;
-    private final LocalDate dataCriacao;
+    private final LocalDateTime dataCriacao;
     private final boolean hasAutoDeposito;
     private final BigDecimal valorAutoDeposito;
     private final Usuario usuarioCriador;
@@ -31,7 +31,7 @@ public class Cofrinho {
         return nome;
     }
 
-    public LocalDate getDataCriacao() {
+    public LocalDateTime getDataCriacao() {
         return dataCriacao;
     }
 
@@ -50,14 +50,14 @@ public class Cofrinho {
     public static class Builder {
         private final Long id;
         private final String nome;
-        private final LocalDate dataCriacao;
+        private final LocalDateTime dataCriacao;
         private final Usuario usuarioCriador;
 
         private boolean hasAutoDeposito      = false;
         private BigDecimal valorAutoDeposito = BigDecimal.ZERO;
 
         public Builder(String nome,
-                       LocalDate dataCriacao,Usuario usuarioCriador)
+                       LocalDateTime dataCriacao,Usuario usuarioCriador)
         {
             this.id = null;
             this.nome = nome;
@@ -78,7 +78,7 @@ public class Cofrinho {
         public Cofrinho build() {
             if (this.nome == null || this.nome.isBlank()) throw new NomeCofrinhoVazioException();
 
-            if (this.dataCriacao == null || this.dataCriacao.isAfter(LocalDate.now())) throw new DataCriacaoException();
+            if (this.dataCriacao == null || this.dataCriacao.isAfter(LocalDateTime.now())) throw new DataCriacaoException();
 
             if (this.hasAutoDeposito && this.valorAutoDeposito.compareTo(BigDecimal.ZERO) <= 0) throw new ValorAutoDepositoException();
 
