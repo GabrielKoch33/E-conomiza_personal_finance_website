@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface ICrudRepository<T> {
     void save(T objeto) throws DataAccessException;
 
-    Optional<T> edit(T objeto) throws DataAccessException;
+    int edit(Long id) throws DataAccessException;
 
-    Optional<T> deleteById(Long id) throws DataAccessException;
+    int deleteById(Long id) throws DataAccessException;
 
     Optional<T> findById(Long id) throws DataAccessException;
 

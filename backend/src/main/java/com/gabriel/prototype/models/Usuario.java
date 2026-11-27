@@ -8,8 +8,8 @@ public class Usuario {
     private final String username;
     private final String senha;
 
-    public Usuario (String nome, String username, String senha) {
-        this.id = null;
+    public Usuario (Long id, String nome, String username, String senha) {
+        this.id = id;
         if (nome == null || nome.isBlank()) throw new NomeUsuarioInvalidoException();
         this.nome = nome ;
         if (username == null || username.isBlank() || username.length() > 30) throw new UsernameInvalidoException();

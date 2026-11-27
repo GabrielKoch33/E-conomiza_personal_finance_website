@@ -6,6 +6,8 @@ import java.sql.SQLException;
 
 public class DBConnectionFactory {
 
+    private DBConnectionFactory() {}
+
     public static Connection getConnection() throws SQLException {
         String url  = "jdbc:postgresql://localhost:5432/economiza";
         String user = "postgres";

@@ -1,8 +1,10 @@
 package com.gabriel.prototype.repositories.interfaces;
 
 import com.gabriel.prototype.exceptions.DataAccessException;
+import com.gabriel.prototype.models.Cofrinho;
 import com.gabriel.prototype.models.Usuario;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
